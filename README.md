@@ -2,7 +2,8 @@ Radio Battletoads (Alpha!)
 ==========================
 
 This is a Alpha version of a new player based on libVLC. It's ugly and simple. It just plays
-the radio. And displays a stupid text pretending to be funny. The ETA joke is hilarious (nope).
+the radio and displays the status. It will probably crash all the time on some ARM6 devices.
+It won't work on Intel and ARM5 devices for now!
 
 How to compile?
 ===============
