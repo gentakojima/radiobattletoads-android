@@ -5,11 +5,14 @@ import org.videolan.libvlc.LibVlcException;
 import org.videolan.libvlc.MediaList;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
+import android.net.NetworkInfo;
 
 public class PlayerService extends Service implements Runnable {
 	
@@ -18,6 +21,8 @@ public class PlayerService extends Service implements Runnable {
 	public final static int PLAYER_READY = 3;
 	public final static int PLAYER_BUFFERING = 4;
 	public final static int PLAYER_PLAYING = 5;
+	public final static int PLAYER_CONNECTIONPROBLEM_NOTSTARTED = 11;
+	public final static int PLAYER_CONNECTIONPROBLEM_CUT = 12;
 	
 	public static LibVLC mLibVLC = null;
 	public static int status = PLAYER_UNINITIALIZED;
@@ -84,11 +89,19 @@ public class PlayerService extends Service implements Runnable {
 	}
 	
 	protected void setStatus(int s){
-		PlayerService.status = s;
+		switch(s){
+		case PLAYER_CONNECTIONPROBLEM_CUT:
+		case PLAYER_CONNECTIONPROBLEM_NOTSTARTED:
+			PlayerService.status = PLAYER_UNINITIALIZED;
+			break;
+			default:
+				PlayerService.status = s;
+		}
+		
         if(PlayerActivity.currentActivity!=null){
 			Message m = new Message();
 			m.what = PlayerActivity.MESSAGE_PLAYERSTATUS;
-			m.arg1 = PlayerService.status;
+			m.arg1 = s;
 			PlayerActivity.currentActivity.messageHandler.sendMessage(m);
 		}
         Log.d("RBT","Status: " + s);
@@ -101,21 +114,57 @@ public class PlayerService extends Service implements Runnable {
 	@Override
 	public void run() {
 		Log.d("RBT","Thread is being run!");
+		// Test connection
+		ConnectivityManager conMgr =  (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+		if(conMgr.getNetworkInfo(0).getState() != NetworkInfo.State.CONNECTED &&
+				conMgr.getNetworkInfo(1).getState() != NetworkInfo.State.CONNECTED ){
+			this.stopSelf();
+			super.onDestroy();
+			playerThread=null;
+			setStatus(PLAYER_CONNECTIONPROBLEM_NOTSTARTED);
+			return;
+		}
+		
+		int tryingToPlay=0;
+		boolean connectionCut = false;
 		// Prepare stream object and play
 		prepare();
 		play();
-		while (playerThread!=null) {
+		while (playerThread!=null && !(status==PLAYER_PLAYING && !mLibVLC.isPlaying()) && tryingToPlay<20 ) {
             try {
             	// Change status?
-            	if(mLibVLC.isPlaying() && PlayerService.status != PLAYER_PLAYING){
-            		setStatus(PLAYER_PLAYING); 
+            	if(PlayerService.status != PLAYER_PLAYING){
+            		if(mLibVLC.isPlaying()){
+            			setStatus(PLAYER_PLAYING);
+            		}
+            		else{
+            			tryingToPlay++;
+            		}
             	}
             	Thread.sleep(500);
             } catch (InterruptedException e){
             }
         }
-		stop();
-		destroy();
+		if(status==PLAYER_PLAYING && !mLibVLC.isPlaying()){
+			connectionCut = true;
+		}
+		if(tryingToPlay>=20){
+			// Too much tries, the connection didn't work!
+			destroy();
+			setStatus(PLAYER_CONNECTIONPROBLEM_NOTSTARTED);
+		}
+		else{
+			if(connectionCut){
+				// The connection was probably shutdown!
+				destroy();
+				setStatus(PLAYER_CONNECTIONPROBLEM_CUT);
+			}
+			else{
+				// Stopped normally
+				stop();
+				destroy();
+			}
+		}
 	}
 
 	@Override

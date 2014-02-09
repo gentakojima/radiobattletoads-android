@@ -2,8 +2,9 @@ Radio Battletoads (Alpha!)
 ==========================
 
 This is a Alpha version of a new player based on libVLC. It's ugly and simple. It just plays
-the radio and displays the status. It will probably crash all the time on some ARM6 devices.
-It won't work on Intel and ARM5 devices for now!
+the radio and displays the status. Every ARMv5, ARMv6, ARMv7 devices should work now!
+Intel devices still won't work for now. I can't get livVLC for x86 to compile.
+VLC requires API level 9 (Android 2.3.0). So Android 2.2 and older versions won't work.
 
 How to compile?
 ===============

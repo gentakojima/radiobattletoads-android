@@ -8,21 +8,44 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".PlayerActivity" >
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:text="¡Hola! Esto es una versión Alpha muy temprana de la nueva aplicación de Radio Battletoads. ¡Gracias por probarla!\n\n¿Por qué lanzar una versión tan cutre? Porque, a diferencia de la vieja aplicación, utiliza libVLC para reproducir la radio. Debería ser infinitamente más compatible y estable, ya que libVLC se encarga de todo (el reproductor nativo es ETA y no funcionaba en versiones de Android anteriores a la 2.3 y algunos Android de Samsung).\n\nEl objetivo de esta Alpha SOLO es reproducir la radio, ¡nada más! ¿Reproduce? ¡Estupendo! ¿No lo hace? ¡Avísanos en @rbattletoads!\nBesitos en la frente." />
+        android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/playbutton"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/textView1"
-        android:layout_marginTop="14dp"
-        android:text="¡Chachi, reproducir la radio!" />
+        <Button
+            android:id="@+id/playbutton"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="¡Haz cosas!" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp" >
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Player status: " />
+
+            <TextView
+                android:id="@+id/playerStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Uninitialized" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Warning: This is ALPHA software. Download the stable version instead from Google Play."
+            android:textColor="#FF0000" />
+
+    </LinearLayout>
 
 </RelativeLayout>

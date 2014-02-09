@@ -54,6 +54,12 @@ public class PlayerActivity extends Activity{
 			case PlayerService.PLAYER_INITIALIZING:
 				tv_status.setText("Initializing...");				
 				break;
+			case PlayerService.PLAYER_CONNECTIONPROBLEM_NOTSTARTED:
+				tv_status.setText("Check your connection!");				
+				break;
+			case PlayerService.PLAYER_CONNECTIONPROBLEM_CUT:
+				tv_status.setText("The stream ended!");				
+				break;
 			}
 			
 			
