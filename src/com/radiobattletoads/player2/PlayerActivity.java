@@ -1,12 +1,18 @@
 package com.radiobattletoads.player2;
 
+
+import java.util.Timer;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
 
 public class PlayerActivity extends Activity{
 	
@@ -14,6 +20,9 @@ public class PlayerActivity extends Activity{
 	public static Context currentContext;
 	
 	public final static int MESSAGE_PLAYERSTATUS = 1; 
+	public final static int MESSAGE_CURRENTPROGRAM = 2;
+	
+	private Timer timer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +37,10 @@ public class PlayerActivity extends Activity{
 		
 		// Set up listeners
 		findViewById(R.id.playbutton).setOnClickListener(new ButtonManager());
+		
+		// Add timer to download current track info
+	    timer = new Timer();
+		timer.schedule(new DownloadCurrentinfo(),0, 60000);
 
 	}
 	
@@ -35,6 +48,9 @@ public class PlayerActivity extends Activity{
 	Handler messageHandler = new Handler(){public void handleMessage(Message m){
 		
 		TextView tv_status = (TextView)currentActivity.findViewById(R.id.playerStatus);
+		TextView tv_title = (TextView)currentActivity.findViewById(R.id.title);
+    	TextView tv_description = (TextView)currentActivity.findViewById(R.id.description);
+    	ImageView iv_artwork = (ImageView)currentActivity.findViewById(R.id.artwork);
 		
 		switch(m.what){
 		case MESSAGE_PLAYERSTATUS:
@@ -61,9 +77,21 @@ public class PlayerActivity extends Activity{
 				tv_status.setText("The stream ended!");				
 				break;
 			}
-			
-			
-			break;	
+			break;
+		case MESSAGE_CURRENTPROGRAM:
+			Log.d("RBT","Received info");
+			switch(m.arg1){
+				case DownloadCurrentinfo.DOWNLOADCURRENTINFO_UPDATED:
+					Log.d("RBT","Received downloaded info");
+					tv_title.setText(m.getData().getString("title"));
+					tv_description.setText(m.getData().getString("description"));
+					iv_artwork.setImageBitmap((Bitmap) m.getData().getParcelable("artwork"));
+					break;
+				case DownloadCurrentinfo.DOWNLOADCURRENTINFO_DOWNLOADING:
+					
+					break;
+			}
+			break;
 		}
 		
 	}};
