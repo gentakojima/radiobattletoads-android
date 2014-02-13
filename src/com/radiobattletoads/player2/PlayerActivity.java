@@ -10,11 +10,12 @@ import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 
-public class PlayerActivity extends Activity{
+import android.support.v7.app.ActionBarActivity;
+
+public class PlayerActivity extends ActionBarActivity{
 	
 	public static PlayerActivity currentActivity = null;
 	public static Context currentContext;

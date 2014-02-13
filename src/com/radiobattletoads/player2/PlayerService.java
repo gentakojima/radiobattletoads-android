@@ -11,7 +11,6 @@ import android.net.ConnectivityManager;
 import android.os.IBinder;
 import android.os.Message;
 import android.util.Log;
-import android.widget.Toast;
 import android.net.NetworkInfo;
 
 public class PlayerService extends Service implements Runnable {
@@ -66,9 +65,7 @@ public class PlayerService extends Service implements Runnable {
         	mLibVLC = LibVLC.getInstance();
         	mLibVLC.init(PlayerActivity.currentActivity);
         } catch(LibVlcException e) {
-            Toast.makeText(PlayerActivity.currentActivity,
-                    "Error initializing the libVLC multimedia framework!",
-                    Toast.LENGTH_LONG).show();
+            Log.d("RBT","Error initializing the libVLC multimedia framework!");
             PlayerActivity.currentActivity.finish();
         }
         
