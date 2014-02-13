@@ -18,6 +18,7 @@ import org.xml.sax.SAXException;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
@@ -127,6 +128,8 @@ public class DownloadCurrentinfo extends TimerTask {
 			return false;
 		}
 	   	HttpClient hc = new DefaultHttpClient();
+	   	String ALLOWED_URI_CHARS = "@#&=*+-_.,:!?()/~'%";
+	   	artwork_url = Uri.encode(artwork_url, ALLOWED_URI_CHARS);
     	HttpGet hg = new HttpGet(artwork_url);
     	try {
 			HttpResponse hr = hc.execute(hg);
