@@ -104,12 +104,18 @@ public class DownloadCurrentinfo extends TimerTask {
 			String track_title_new = nodes.item(0).getFirstChild().getNodeValue();
 			
 			nodes = document.getElementsByTagName("episodio");
-			String track_description_new = nodes.item(0).getFirstChild().getNodeValue();
+			String track_description_new = null;
+			try{
+				track_description_new = nodes.item(0).getFirstChild().getNodeValue();
+			}
+			catch(NullPointerException e){
+				// TODO no episode name, do something?
+			}
 			
 			nodes = document.getElementsByTagName("icono");
 			String new_artwork_url = nodes.item(0).getFirstChild().getNodeValue();
 			
-			if(track_title==null || (track_title_new.compareTo(track_title)!=0 && track_description_new.compareTo(track_description)!=0)){
+			if(track_title==null || track_title_new.compareTo(track_title)!=0 || (track_description==null && track_description_new!=null) || (track_description_new!=null && track_description_new.compareTo(track_description)!=0)){
 				Log.d("RBT","Different title and desc!");
 				track_title = track_title_new;
 				track_description = track_description_new;
