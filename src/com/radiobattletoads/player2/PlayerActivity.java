@@ -27,6 +27,10 @@ public class PlayerActivity extends ActionBarActivity{
 	public final static int MESSAGE_CURRENTPROGRAM = 2;
 	
 	private Timer timer;
+	
+	public static final int STATUS_TRACKINFO_UNINITIALIZED=1;
+	public static final int STATUS_TRACKINFO_INITIALIZED=2;
+	public int status_trackinfo;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,9 +46,16 @@ public class PlayerActivity extends ActionBarActivity{
 		// Set up listeners
 		findViewById(R.id.playbutton).setOnClickListener(new ButtonManager());
 		
-		// Add timer to download current track info
+		// Add timer to download current track info and initialize
+		status_trackinfo=STATUS_TRACKINFO_UNINITIALIZED;
 	    timer = new Timer();
 		timer.schedule(new DownloadCurrentinfo(),0, 15000);
+		
+		// Initialize player status
+		Message m = new Message();
+		m.what = PlayerActivity.MESSAGE_PLAYERSTATUS;
+		m.arg1 = PlayerService.status;
+		PlayerActivity.currentActivity.messageHandler.sendMessage(m);
 
 	}
 	

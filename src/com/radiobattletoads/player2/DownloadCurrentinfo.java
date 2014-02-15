@@ -169,8 +169,9 @@ public class DownloadCurrentinfo extends TimerTask {
 	
 	@Override
 	public void run() {
-		if(downloadInfo()){
-			Log.d("RBT","Downloadinfo returned true");
+		if(downloadInfo() || (PlayerActivity.currentActivity!=null &&  PlayerActivity.currentActivity.status_trackinfo==PlayerActivity.STATUS_TRACKINFO_UNINITIALIZED)){
+			Log.d("RBT","Downloadinfo returned true or initializing");
+			PlayerActivity.currentActivity.status_trackinfo = PlayerActivity.STATUS_TRACKINFO_INITIALIZED;
 			sendToActivity();
 		}
 		else{
