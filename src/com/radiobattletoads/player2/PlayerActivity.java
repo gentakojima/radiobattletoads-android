@@ -11,7 +11,9 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.View;
 import android.view.animation.RotateAnimation;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
@@ -50,6 +52,7 @@ public class PlayerActivity extends ActionBarActivity{
 		
 		// Set up listeners
 		findViewById(R.id.playbutton).setOnClickListener(new ButtonManager());
+		findViewById(R.id.pauseButton).setOnClickListener(new ButtonManager());
 		
 		// Add timer to download current track info and initialize
 		status_trackinfo=STATUS_TRACKINFO_UNINITIALIZED;
@@ -82,30 +85,54 @@ public class PlayerActivity extends ActionBarActivity{
 		TextView tv_status = (TextView)currentActivity.findViewById(R.id.playerStatus);
 		LinearLayout trackinfo_layout_container = (LinearLayout) currentActivity.findViewById(R.id.trackInfoLayout);
 		final float scale = currentContext.getResources().getDisplayMetrics().density;
+		LinearLayout bufferingLayout = (LinearLayout) currentActivity.findViewById(R.id.bufferingLayout);
+		Button playButton = (Button) currentActivity.findViewById(R.id.playbutton);
+		Button pauseButton = (Button) currentActivity.findViewById(R.id.pauseButton);
 		
 		switch(m.what){
 		case MESSAGE_PLAYERSTATUS:
 			switch(m.arg1){
 			case PlayerService.PLAYER_UNINITIALIZED:
-				tv_status.setText("Uninitialized");				
+				tv_status.setText("Uninitialized");	
+				bufferingLayout.setVisibility(View.GONE);
+				playButton.setVisibility(View.VISIBLE);
+				pauseButton.setVisibility(View.GONE);
 				break;
 			case PlayerService.PLAYER_READY:
-				tv_status.setText("Ready (idle)");				
+				tv_status.setText("Ready (idle)");
+				bufferingLayout.setVisibility(View.VISIBLE);
+				playButton.setVisibility(View.GONE);
+				pauseButton.setVisibility(View.GONE);
 				break;
 			case PlayerService.PLAYER_PLAYING:
-				tv_status.setText("Playing");				
+				tv_status.setText("Playing");
+				bufferingLayout.setVisibility(View.GONE);
+				playButton.setVisibility(View.GONE);
+				pauseButton.setVisibility(View.VISIBLE);
 				break;
 			case PlayerService.PLAYER_BUFFERING:
-				tv_status.setText("Buffering...");				
+				tv_status.setText("Buffering...");
+				bufferingLayout.setVisibility(View.VISIBLE);
+				playButton.setVisibility(View.GONE);
+				pauseButton.setVisibility(View.GONE);
 				break;
 			case PlayerService.PLAYER_INITIALIZING:
-				tv_status.setText("Initializing...");				
+				tv_status.setText("Initializing...");
+				bufferingLayout.setVisibility(View.VISIBLE);
+				playButton.setVisibility(View.GONE);
+				pauseButton.setVisibility(View.GONE);
 				break;
 			case PlayerService.PLAYER_CONNECTIONPROBLEM_NOTSTARTED:
-				tv_status.setText("Check your connection!");				
+				tv_status.setText("Check your connection!");	
+				bufferingLayout.setVisibility(View.GONE);
+				playButton.setVisibility(View.VISIBLE);
+				pauseButton.setVisibility(View.GONE);
 				break;
 			case PlayerService.PLAYER_CONNECTIONPROBLEM_CUT:
-				tv_status.setText("The stream ended!");				
+				tv_status.setText("The stream ended!");
+				bufferingLayout.setVisibility(View.GONE);
+				playButton.setVisibility(View.VISIBLE);
+				pauseButton.setVisibility(View.GONE);
 				break;
 			}
 			break;
