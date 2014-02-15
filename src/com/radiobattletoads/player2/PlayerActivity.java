@@ -6,9 +6,11 @@ import java.util.Timer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.TextUtils.TruncateAt;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
@@ -52,6 +54,9 @@ public class PlayerActivity extends ActionBarActivity{
 		timer.schedule(new DownloadCurrentinfo(),0, 15000);
 		
 		// Initialize player status
+		LayoutParams trackInfoParams = new LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT,
+				getWindowManager().getDefaultDisplay().getWidth() / 3 + 40);
+		findViewById(R.id.trackInfoLayout).setLayoutParams(trackInfoParams);
 		Message m = new Message();
 		m.what = PlayerActivity.MESSAGE_PLAYERSTATUS;
 		m.arg1 = PlayerService.status;
@@ -109,14 +114,14 @@ public class PlayerActivity extends ActionBarActivity{
 					trackinfo_layout.addView(trackinfo_textlayout);
 					
 					LayoutParams trackinfo_image_params = new LayoutParams( getWindowManager().getDefaultDisplay().getWidth() / 3, 
-							LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-					trackinfo_image_params.setMargins(20, 20, 7, 10);
+							getWindowManager().getDefaultDisplay().getWidth() / 3, 1.0f);
+					trackinfo_image_params.setMargins(20, 20, 7, 20);
 					trackinfo_image.setLayoutParams(trackinfo_image_params);
-					trackinfo_image.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+					trackinfo_image.setScaleType(ScaleType.FIT_CENTER);
 					
 					LayoutParams trackinfo_textlayout_params = new LayoutParams( 2 * (getWindowManager().getDefaultDisplay().getWidth() / 3) , 
 							LinearLayout.LayoutParams.MATCH_PARENT,1.0f);
-					trackinfo_textlayout_params.setMargins(7, 20, 20, 10);
+					trackinfo_textlayout_params.setMargins(7, 20, 20, 20);
 					trackinfo_textlayout.setLayoutParams(trackinfo_textlayout_params);
 					
 					trackinfo_textlayout.setOrientation(LinearLayout.VERTICAL);
@@ -131,6 +136,8 @@ public class PlayerActivity extends ActionBarActivity{
 					trackinfo_title.setGravity(Gravity.BOTTOM);
 					trackinfo_description.setTextSize((int) (9 * scale + 0.5f));
 					trackinfo_description.setGravity(Gravity.TOP);
+					trackinfo_description.setMaxLines(2);
+					trackinfo_description.setEllipsize(TruncateAt.END);
 
 					trackinfo_title.setText(m.getData().getString("title"));
 					trackinfo_description.setText(m.getData().getString("description"));
