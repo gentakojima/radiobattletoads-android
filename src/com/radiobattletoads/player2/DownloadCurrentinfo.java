@@ -116,10 +116,10 @@ public class DownloadCurrentinfo extends TimerTask {
 			String new_artwork_url = nodes.item(0).getFirstChild().getNodeValue();
 			
 			if(track_title==null || track_title_new.compareTo(track_title)!=0 || (track_description==null && track_description_new!=null) || (track_description_new!=null && track_description_new.compareTo(track_description)!=0)){
-				Log.d("RBT","Different title and desc!");
+				Log.d("RBT","Different title and desc! " + track_title_new + "!=" + track_title + " OR " + track_description_new + "!=" + track_description);
 				track_title = track_title_new;
 				track_description = track_description_new;
-				if(artwork_url==null || new_artwork_url.compareTo(artwork_url)==0){
+				if(artwork_url==null || new_artwork_url.compareTo(artwork_url)!=0){
 					artwork_url = new_artwork_url;
 					downloadArtwork();
 				}

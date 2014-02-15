@@ -110,13 +110,13 @@ public class PlayerActivity extends ActionBarActivity{
 					
 					LayoutParams trackinfo_image_params = new LayoutParams( getWindowManager().getDefaultDisplay().getWidth() / 3, 
 							LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
-					trackinfo_image_params.setMargins(20, 20, 10, 10);
+					trackinfo_image_params.setMargins(20, 20, 7, 10);
 					trackinfo_image.setLayoutParams(trackinfo_image_params);
 					trackinfo_image.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 					
 					LayoutParams trackinfo_textlayout_params = new LayoutParams( 2 * (getWindowManager().getDefaultDisplay().getWidth() / 3) , 
 							LinearLayout.LayoutParams.MATCH_PARENT,1.0f);
-					trackinfo_image_params.setMargins(10, 20, 20, 10);
+					trackinfo_textlayout_params.setMargins(7, 20, 20, 10);
 					trackinfo_textlayout.setLayoutParams(trackinfo_textlayout_params);
 					
 					trackinfo_textlayout.setOrientation(LinearLayout.VERTICAL);
