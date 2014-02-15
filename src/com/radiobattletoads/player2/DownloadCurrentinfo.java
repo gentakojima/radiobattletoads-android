@@ -36,7 +36,7 @@ public class DownloadCurrentinfo extends TimerTask {
 	public static String track_description;
 	public static String artwork_url;
 	public static Bitmap artwork_image;
-	
+
 	public static int status;
 
 	public DownloadCurrentinfo() {
@@ -101,18 +101,28 @@ public class DownloadCurrentinfo extends TimerTask {
 			}
 
 			NodeList nodes = document.getElementsByTagName("programa");
-			track_title = nodes.item(0).getFirstChild().getNodeValue();
+			String track_title_new = nodes.item(0).getFirstChild().getNodeValue();
 			
 			nodes = document.getElementsByTagName("episodio");
-			track_description = nodes.item(0).getFirstChild().getNodeValue();
+			String track_description_new = nodes.item(0).getFirstChild().getNodeValue();
 			
 			nodes = document.getElementsByTagName("icono");
 			String new_artwork_url = nodes.item(0).getFirstChild().getNodeValue();
-			if(new_artwork_url != artwork_url){
-				artwork_url = new_artwork_url;
-				downloadArtwork();
+			
+			if(track_title==null || (track_title_new.compareTo(track_title)!=0 && track_description_new.compareTo(track_description)!=0)){
+				Log.d("RBT","Different title and desc!");
+				track_title = track_title_new;
+				track_description = track_description_new;
+				if(artwork_url==null || new_artwork_url.compareTo(artwork_url)==0){
+					artwork_url = new_artwork_url;
+					downloadArtwork();
+				}
+			    return true;
 			}
-			return true;
+			else{
+				Log.d("RBT","Same title and desc!");
+				return false;
+			}
 			
     	} catch (Exception e) {
     		Log.d("RBT","Exception downloading :( " + e.getClass() + "---" + e.getMessage());

@@ -7,7 +7,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -41,17 +44,17 @@ public class PlayerActivity extends ActionBarActivity{
 		
 		// Add timer to download current track info
 	    timer = new Timer();
-		timer.schedule(new DownloadCurrentinfo(),0, 60000);
+		timer.schedule(new DownloadCurrentinfo(),0, 15000);
 
 	}
 	
 	@SuppressLint("HandlerLeak")
-	Handler messageHandler = new Handler(){public void handleMessage(Message m){
-		
+	Handler messageHandler = new Handler(){@SuppressWarnings("deprecation")
+	public void handleMessage(Message m){
+			
 		TextView tv_status = (TextView)currentActivity.findViewById(R.id.playerStatus);
-		TextView tv_title = (TextView)currentActivity.findViewById(R.id.title);
-    	TextView tv_description = (TextView)currentActivity.findViewById(R.id.description);
-    	ImageView iv_artwork = (ImageView)currentActivity.findViewById(R.id.artwork);
+		LinearLayout trackinfo_layout_container = (LinearLayout) currentActivity.findViewById(R.id.trackInfoLayout);
+		final float scale = currentContext.getResources().getDisplayMetrics().density;
 		
 		switch(m.what){
 		case MESSAGE_PLAYERSTATUS:
@@ -84,9 +87,47 @@ public class PlayerActivity extends ActionBarActivity{
 			switch(m.arg1){
 				case DownloadCurrentinfo.DOWNLOADCURRENTINFO_UPDATED:
 					Log.d("RBT","Received downloaded info");
-					tv_title.setText(m.getData().getString("title"));
-					tv_description.setText(m.getData().getString("description"));
-					iv_artwork.setImageBitmap((Bitmap) m.getData().getParcelable("artwork"));
+					
+					LinearLayout trackinfo_layout = new LinearLayout(PlayerActivity.currentContext);
+					LinearLayout trackinfo_textlayout = new LinearLayout(PlayerActivity.currentContext);
+					ImageView trackinfo_image = new ImageView(PlayerActivity.currentContext);
+					TextView trackinfo_title = new TextView(PlayerActivity.currentContext);
+					TextView trackinfo_description = new TextView(PlayerActivity.currentContext);
+					
+					trackinfo_layout.addView(trackinfo_image);
+					trackinfo_layout.addView(trackinfo_textlayout);
+					
+					LayoutParams trackinfo_image_params = new LayoutParams( getWindowManager().getDefaultDisplay().getWidth() / 3, 
+							LinearLayout.LayoutParams.WRAP_CONTENT, 1.0f);
+					trackinfo_image_params.setMargins(20, 20, 10, 10);
+					trackinfo_image.setLayoutParams(trackinfo_image_params);
+					trackinfo_image.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+					
+					LayoutParams trackinfo_textlayout_params = new LayoutParams( 2 * (getWindowManager().getDefaultDisplay().getWidth() / 3) , 
+							LinearLayout.LayoutParams.MATCH_PARENT,1.0f);
+					trackinfo_image_params.setMargins(10, 20, 20, 10);
+					trackinfo_textlayout.setLayoutParams(trackinfo_textlayout_params);
+					
+					trackinfo_textlayout.setOrientation(LinearLayout.VERTICAL);
+					LayoutParams trackinfo_titledesc_params = new LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT, 
+							LinearLayout.LayoutParams.MATCH_PARENT,1.0f);
+					trackinfo_title.setLayoutParams(trackinfo_titledesc_params);
+					trackinfo_textlayout.addView(trackinfo_title);
+					trackinfo_description.setLayoutParams(trackinfo_titledesc_params);
+					trackinfo_textlayout.addView(trackinfo_description);
+					
+					trackinfo_title.setTextSize((int) (12 * scale + 0.5f));
+					trackinfo_title.setGravity(Gravity.BOTTOM);
+					trackinfo_description.setTextSize((int) (9 * scale + 0.5f));
+					trackinfo_description.setGravity(Gravity.TOP);
+
+					trackinfo_title.setText(m.getData().getString("title"));
+					trackinfo_description.setText(m.getData().getString("description"));
+					trackinfo_image.setImageBitmap((Bitmap) m.getData().getParcelable("artwork"));
+					
+					trackinfo_layout_container.removeAllViews();
+					trackinfo_layout_container.addView(trackinfo_layout);
+					
 					break;
 				case DownloadCurrentinfo.DOWNLOADCURRENTINFO_DOWNLOADING:
 					
