@@ -9,6 +9,9 @@ import android.os.Message;
 import android.text.TextUtils.TruncateAt;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.animation.RotateAnimation;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
@@ -53,7 +56,7 @@ public class PlayerActivity extends ActionBarActivity{
 	    timer = new Timer();
 		timer.schedule(new DownloadCurrentinfo(),0, 15000);
 		
-		// Initialize player status
+		// Initialize player looks and status
 		LayoutParams trackInfoParams = new LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT,
 				getWindowManager().getDefaultDisplay().getWidth() / 3 + 40);
 		findViewById(R.id.trackInfoLayout).setLayoutParams(trackInfoParams);
@@ -62,6 +65,14 @@ public class PlayerActivity extends ActionBarActivity{
 		m.arg1 = PlayerService.status;
 		PlayerActivity.currentActivity.messageHandler.sendMessage(m);
 
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+	    // Inflate the menu items for use in the action bar
+	    MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.player_activity_actions, menu);
+	    return super.onCreateOptionsMenu(menu);
 	}
 	
 	@SuppressLint("HandlerLeak")
@@ -143,7 +154,7 @@ public class PlayerActivity extends ActionBarActivity{
 					trackinfo_description.setText(m.getData().getString("description"));
 					trackinfo_image.setImageBitmap((Bitmap) m.getData().getParcelable("artwork"));
 					
-					trackinfo_layout_container.removeAllViews();
+					trackinfo_layout_container.removeViewAt(0);
 					trackinfo_layout_container.addView(trackinfo_layout);
 					
 					break;
