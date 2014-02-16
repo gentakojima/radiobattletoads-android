@@ -8,4 +8,5 @@
     <string name="play">Play</string>
     <string name="pause">Pause</string>
     <string name="buffering">Buffering&#8230;</string>
+    <string name="cantdownloadinfo">Can\'t download current track info. Please check your connection.</string>
 </resources>

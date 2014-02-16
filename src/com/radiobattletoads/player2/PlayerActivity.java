@@ -185,6 +185,27 @@ public class PlayerActivity extends ActionBarActivity{
 					trackinfo_layout_container.addView(trackinfo_layout);
 					
 					break;
+				case DownloadCurrentinfo.DOWNLOADCURRENTINFO_FAILED:
+					Log.d("RBT","Not received downloaded info. Connection failed?");
+					LinearLayout trackinfoerror_layout = new LinearLayout(PlayerActivity.currentContext);
+					LayoutParams trackinfoerror_layout_params = new LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT,
+							getWindowManager().getDefaultDisplay().getWidth() / 3, 1.0f);
+					trackinfoerror_layout.setLayoutParams(trackinfoerror_layout_params);
+					
+					LayoutParams trackinfoerror_textlayout_params = new LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT,
+							LinearLayout.LayoutParams.MATCH_PARENT);
+					trackinfoerror_textlayout_params.setMargins(20, 20, 20, 20);
+					TextView trackinfoerror_text = new TextView(PlayerActivity.currentContext);
+					trackinfoerror_text.setTextSize((int) (12 * scale + 0.5f));
+					trackinfoerror_text.setGravity(Gravity.CENTER);
+					trackinfoerror_text.setText(R.string.cantdownloadinfo);
+					trackinfoerror_text.setLayoutParams(trackinfoerror_textlayout_params);
+					
+					trackinfoerror_layout.addView(trackinfoerror_text);
+					trackinfo_layout_container.removeViewAt(0);
+					trackinfo_layout_container.addView(trackinfoerror_layout);
+					
+					break;
 				case DownloadCurrentinfo.DOWNLOADCURRENTINFO_DOWNLOADING:
 					
 					break;

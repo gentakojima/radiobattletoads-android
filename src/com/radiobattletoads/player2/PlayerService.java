@@ -112,9 +112,7 @@ public class PlayerService extends Service implements Runnable {
 	public void run() {
 		Log.d("RBT","Thread is being run!");
 		// Test connection
-		ConnectivityManager conMgr =  (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-		if(conMgr.getNetworkInfo(0).getState() != NetworkInfo.State.CONNECTED &&
-				conMgr.getNetworkInfo(1).getState() != NetworkInfo.State.CONNECTED ){
+		if(NetworkStatus.getStatus(PlayerActivity.currentContext)==NetworkStatus.NETWORK_DISCONNECTED){
 			this.stopSelf();
 			super.onDestroy();
 			playerThread=null;

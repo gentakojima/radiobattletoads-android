@@ -59,12 +59,17 @@ public class DownloadCurrentinfo extends TimerTask {
 			PlayerActivity.currentActivity.messageHandler.sendMessage(m);
 		}
 		else{
-			// TODO maybe send failure downloading info?
+			// TODO do something? This path should never be reached
 		}
 	}
 	
 	private boolean downloadInfo(){
 		Log.d("RBT","Downloading info");
+		
+		if(NetworkStatus.getStatus(PlayerActivity.currentContext)==NetworkStatus.NETWORK_DISCONNECTED){
+			return false;
+		}
+		
 		HttpClient hc = new DefaultHttpClient();
     	HttpGet hg = new HttpGet("http://www.radiobattletoads.com/api/calendario.php?ahora=1&calendario=0");
     	
@@ -182,6 +187,12 @@ public class DownloadCurrentinfo extends TimerTask {
 		}
 		else{
 			Log.d("RBT","Downloadinfo returned FALSE");
+			if(track_title==null){
+				Message m = new Message();
+				m.what = PlayerActivity.MESSAGE_CURRENTPROGRAM;
+				m.arg1 = DOWNLOADCURRENTINFO_FAILED;
+				PlayerActivity.currentActivity.messageHandler.sendMessage(m);
+			}
 		}
 	}
 
