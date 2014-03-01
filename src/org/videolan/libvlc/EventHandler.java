@@ -35,7 +35,7 @@ public class EventHandler {
     //public static final int MediaMetaChanged                = 0;
     //public static final int MediaSubItemAdded               = 1;
     //public static final int MediaDurationChanged            = 2;
-    //public static final int MediaParsedChanged              = 3;
+    public static final int MediaParsedChanged                = 3;
     //public static final int MediaFreed                      = 4;
     //public static final int MediaStateChanged               = 5;
 
@@ -93,6 +93,8 @@ public class EventHandler {
     public static final int CustomMediaListItemAdded          = 0x2002;
     public static final int CustomMediaListItemDeleted        = 0x2003;
     public static final int CustomMediaListItemMoved          = 0x2004;
+
+    public static final int HardwareAccelerationError         = 0x3000;
 
     private ArrayList<Handler> mEventHandler;
     private static EventHandler mInstance;

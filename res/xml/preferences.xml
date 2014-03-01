@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android" android:title="@string/preferences_title">
+    <PreferenceCategory android:title="@string/preferences_network">
+        <com.radiobattletoads.player2.EditTextPreference 
+    android:id="@+id/preferences_description"
+    android:defaultValue="1500" 
+    android:key="buffering" 
+    android:title="Buffering" 
+    android:inputType="number"
+    android:summary="% milliseconds"
+    />  
+    </PreferenceCategory>
+</PreferenceScreen>

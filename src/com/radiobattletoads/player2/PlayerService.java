@@ -5,13 +5,12 @@ import org.videolan.libvlc.LibVlcException;
 import org.videolan.libvlc.MediaList;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
+import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
-import android.net.NetworkInfo;
 
 public class PlayerService extends Service implements Runnable {
 	
@@ -33,7 +32,7 @@ public class PlayerService extends Service implements Runnable {
 	protected void play(){
 		// Play radio (assuming prepare was called before)
         mLibVLC.playIndex(0);
-        mLibVLC.play();
+        //mLibVLC.play();
         // Set current status
         setStatus(PLAYER_BUFFERING);
 	}
@@ -63,18 +62,20 @@ public class PlayerService extends Service implements Runnable {
 		// Initialize the multimedia framework
         try {
         	mLibVLC = LibVLC.getInstance();
+        	
+        	// Set network caching (defaults to 1,5s)
+        	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(PlayerActivity.currentActivity);
+            mLibVLC.setNetworkCaching(preferences.getInt("buffering", 1500));
+        	
+        	// Unset verbose mode
+            mLibVLC.setVerboseMode(true);
+            
         	mLibVLC.init(PlayerActivity.currentActivity);
         } catch(LibVlcException e) {
             Log.d("RBT","Error initializing the libVLC multimedia framework!");
             PlayerActivity.currentActivity.finish();
         }
-        
-        // Unset verbose mode
-        mLibVLC.setVerboseMode(false);
-        
-        // Set 2 seconds for network caching
-        mLibVLC.setNetworkCaching(2000);
-        
+
         // Load media list, clear it and add radio
         MediaList list = mLibVLC.getPrimaryMediaList();
         list.clear();

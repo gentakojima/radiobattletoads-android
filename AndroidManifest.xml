@@ -26,6 +26,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="com.radiobattletoads.player2.PreferencesActivity" android:label="@string/app_name" android:launchMode="singleTop">
+        </activity>
         <service android:name="com.radiobattletoads.player2.PlayerService" />
     </application>
 

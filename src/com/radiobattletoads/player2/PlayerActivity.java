@@ -11,8 +11,8 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
@@ -21,6 +21,7 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 
 import android.support.v7.app.ActionBarActivity;
@@ -214,6 +215,27 @@ public class PlayerActivity extends ActionBarActivity{
 		}
 		
 	}};
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	    case R.id.action_about:
+	    	/*Builder builder = new AlertDialog.Builder(this);
+	  	    builder.setTitle(R.string.about_title);
+	  	    builder.setMessage(R.string.about_body);
+	  	    builder.setNeutralButton(android.R.string.ok, null);
+	  	    builder.show();*/
+	        return true;
+	    case R.id.action_settings:
+	    	Intent intent = new Intent(PlayerActivity.this, PreferencesActivity.class);
+	    	PlayerActivity.this.startActivity(intent);
+	        return true;
+	    default:
+	        return super.onOptionsItemSelected(item);
+	    }
+	}
+	
 
 
 
