@@ -11,11 +11,17 @@ public abstract class NetworkStatus {
 	
 	public static int getStatus(Context context){
 		ConnectivityManager conMgr =  (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
-		if(conMgr.getNetworkInfo(0).getState() != NetworkInfo.State.CONNECTED &&
-				conMgr.getNetworkInfo(1).getState() != NetworkInfo.State.CONNECTED ){
-			return NETWORK_DISCONNECTED;
+		try{
+			if(conMgr.getNetworkInfo(0).getState() != NetworkInfo.State.CONNECTED &&
+					conMgr.getNetworkInfo(1).getState() != NetworkInfo.State.CONNECTED ){
+				return NETWORK_DISCONNECTED;
+			}
+			else{
+				return NETWORK_CONNECTED;
+			}
 		}
-		else{
+		catch(NullPointerException e){
+			// Some devices don't implement this, so just go on
 			return NETWORK_CONNECTED;
 		}
 	}

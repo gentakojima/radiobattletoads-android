@@ -65,7 +65,7 @@ public class PlayerService extends Service implements Runnable {
         	
         	// Set network caching (defaults to 1,5s)
         	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(PlayerActivity.currentActivity);
-            mLibVLC.setNetworkCaching(preferences.getInt("buffering", 1500));
+            mLibVLC.setNetworkCaching(Integer.parseInt(preferences.getString("buffering", "1500")));
         	
         	// Unset verbose mode
             mLibVLC.setVerboseMode(true);

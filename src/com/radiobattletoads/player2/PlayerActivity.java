@@ -184,7 +184,7 @@ public class PlayerActivity extends ActionBarActivity{
 					
 					trackinfo_layout_container.removeViewAt(0);
 					trackinfo_layout_container.addView(trackinfo_layout);
-					
+
 					break;
 				case DownloadCurrentinfo.DOWNLOADCURRENTINFO_FAILED:
 					Log.d("RBT","Not received downloaded info. Connection failed?");
