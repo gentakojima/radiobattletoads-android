@@ -126,7 +126,10 @@ public class PlayerService extends Service implements Runnable {
 		// Prepare stream object and play
 		prepare();
 		play();
-		while (playerThread!=null && !(status==PLAYER_PLAYING && !mLibVLC.isPlaying()) && tryingToPlay<20 ) {
+		
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(PlayerActivity.currentActivity);
+		Integer bufferingMsecs = Integer.parseInt(preferences.getString("buffering", "1500"));
+		while (playerThread!=null && !(status==PLAYER_PLAYING && !mLibVLC.isPlaying()) && tryingToPlay<(20+(bufferingMsecs/1000))) {
             try {
             	// Change status?
             	if(PlayerService.status != PLAYER_PLAYING){

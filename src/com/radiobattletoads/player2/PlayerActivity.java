@@ -58,7 +58,7 @@ public class PlayerActivity extends ActionBarActivity{
 		// Add timer to download current track info and initialize
 		status_trackinfo=STATUS_TRACKINFO_UNINITIALIZED;
 	    timer = new Timer();
-		timer.schedule(new DownloadCurrentinfo(),0, 15000);
+		timer.schedule(new DownloadCurrentinfo(),0, 18000);
 		
 		// Initialize player looks and status
 		LayoutParams trackInfoParams = new LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT,
