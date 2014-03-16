@@ -1,19 +1,18 @@
 package com.radiobattletoads.player2;
 
-import java.util.Random;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.provider.SyncStateContract.Constants;
 import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationCompat.Builder;
 
 public class Notifications {
 	
 	static NotificationManager notificationManager = null;
+	static Builder notif = null;
 	
 	public static boolean addNotification(){
 		
@@ -33,7 +32,7 @@ public class Notifications {
         int notif_height = (int) res.getDimension(android.R.dimen.notification_large_icon_height);
         int notif_width = (int) res.getDimension(android.R.dimen.notification_large_icon_width);
         Bitmap large_bitmap = Bitmap.createScaledBitmap(DownloadCurrentinfo.getCurrentArtwork(),notif_width,notif_height,false);
-		Notification n  = new NotificationCompat.Builder(PlayerActivity.currentContext)
+		notif  = new NotificationCompat.Builder(PlayerActivity.currentContext)
 		        .setContentTitle("Radio Battletoads")
 		        .setContentText(DownloadCurrentinfo.getCurrentInfo())
 		        .setLargeIcon(large_bitmap)
@@ -41,13 +40,38 @@ public class Notifications {
 		        .setContentIntent(contentIntent)
 		        .setAutoCancel(true)
 		        .setOngoing(true)
-		        .addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent).build();
-		n.flags = Notification.FLAG_NO_CLEAR;
+		        .addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
+		Notification notifBuilt = notif.build();
+		notifBuilt.flags = Notification.FLAG_NO_CLEAR;
 		
 		// Show the notification
-		notificationManager.notify(0, n); 
+		notificationManager.notify(0, notifBuilt); 
 		
 		return true;
+	}
+	
+	public static boolean updateNotification(){
+		
+		if(notificationManager==null){
+			notificationManager = (NotificationManager)PlayerActivity.currentContext.getSystemService(PlayerActivity.currentContext.NOTIFICATION_SERVICE);
+		}
+		
+		if(notif!=null){
+			Resources res = PlayerActivity.currentContext.getResources();
+			int notif_height = (int) res.getDimension(android.R.dimen.notification_large_icon_height);
+	        int notif_width = (int) res.getDimension(android.R.dimen.notification_large_icon_width);
+	        Bitmap large_bitmap = Bitmap.createScaledBitmap(DownloadCurrentinfo.getCurrentArtwork(),notif_width,notif_height,false);
+			notif.setContentText(DownloadCurrentinfo.getCurrentInfo());
+			notif.setLargeIcon(large_bitmap);
+			Notification notifBuilt = notif.build();
+			notifBuilt.flags = Notification.FLAG_NO_CLEAR;
+			// Show the notification
+			notificationManager.notify(0, notifBuilt); 
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 	
 	public static boolean removeNotification(){

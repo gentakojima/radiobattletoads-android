@@ -185,6 +185,10 @@ public class DownloadCurrentinfo extends TimerTask {
 			Log.d("RBT","Downloadinfo returned true or initializing");
 			PlayerActivity.currentActivity.status_trackinfo = PlayerActivity.STATUS_TRACKINFO_INITIALIZED;
 			sendToActivity();
+			// Update notification?
+			if(PlayerService.status==PlayerService.PLAYER_PLAYING){
+				Notifications.updateNotification();
+			}
 		}
 		else{
 			Log.d("RBT","Downloadinfo returned FALSE");
