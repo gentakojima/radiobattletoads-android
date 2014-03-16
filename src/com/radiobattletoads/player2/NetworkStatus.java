@@ -12,8 +12,7 @@ public abstract class NetworkStatus {
 	public static int getStatus(Context context){
 		ConnectivityManager conMgr =  (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		try{
-			if(conMgr.getNetworkInfo(0).getState() != NetworkInfo.State.CONNECTED &&
-					conMgr.getNetworkInfo(1).getState() != NetworkInfo.State.CONNECTED ){
+			if(conMgr.getActiveNetworkInfo().isConnected() == false){
 				return NETWORK_DISCONNECTED;
 			}
 			else{
