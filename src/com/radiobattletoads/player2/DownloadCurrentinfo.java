@@ -18,6 +18,7 @@ import org.xml.sax.SAXException;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Message;
@@ -193,6 +194,27 @@ public class DownloadCurrentinfo extends TimerTask {
 				m.arg1 = DOWNLOADCURRENTINFO_FAILED;
 				PlayerActivity.currentActivity.messageHandler.sendMessage(m);
 			}
+		}
+	}
+	
+	public static String getCurrentInfo(){
+		if(track_title != null && track_description != null){
+			return track_title + " - " + track_description;
+		}
+		else if(track_title != null){
+			return track_title;
+		}
+		else{
+			return "";
+		}
+	}
+	
+	public static Bitmap getCurrentArtwork(){
+		if(artwork_image!=null){
+			return artwork_image;
+		}
+		else{
+			return BitmapFactory.decodeResource(PlayerActivity.currentContext.getResources(),R.drawable.ic_launcher);
 		}
 	}
 

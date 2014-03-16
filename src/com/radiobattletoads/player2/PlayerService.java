@@ -87,6 +87,8 @@ public class PlayerService extends Service implements Runnable {
 	}
 	
 	protected void setStatus(int s){
+		
+		// Transform transitional states to final states
 		switch(s){
 		case PLAYER_CONNECTIONPROBLEM_CUT:
 		case PLAYER_CONNECTIONPROBLEM_NOTSTARTED:
@@ -96,6 +98,17 @@ public class PlayerService extends Service implements Runnable {
 				PlayerService.status = s;
 		}
 		
+		// Show or hide notification
+		switch(PlayerService.status){
+		case PLAYER_PLAYING:
+			Notifications.addNotification();
+			break;
+		case PLAYER_UNINITIALIZED:
+			Notifications.removeNotification();
+			break;
+		}
+		
+		// Send message to activity
         if(PlayerActivity.currentActivity!=null){
 			Message m = new Message();
 			m.what = PlayerActivity.MESSAGE_PLAYERSTATUS;

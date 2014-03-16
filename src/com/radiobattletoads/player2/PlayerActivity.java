@@ -20,8 +20,10 @@ import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TextView;
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 
 import android.support.v7.app.ActionBarActivity;
@@ -39,6 +41,8 @@ public class PlayerActivity extends ActionBarActivity{
 	public static final int STATUS_TRACKINFO_UNINITIALIZED=1;
 	public static final int STATUS_TRACKINFO_INITIALIZED=2;
 	public int status_trackinfo;
+	
+	public static final String BROADCAST_PAUSE="broadcast_pause";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +72,19 @@ public class PlayerActivity extends ActionBarActivity{
 		m.what = PlayerActivity.MESSAGE_PLAYERSTATUS;
 		m.arg1 = PlayerService.status;
 		PlayerActivity.currentActivity.messageHandler.sendMessage(m);
+		
+		// Broadcast to receive notification actions
+		BroadcastReceiver receiver = new BroadcastReceiver() {
+		    @Override
+		    public void onReceive(Context context, Intent intent) {
+		        if (intent.getAction().equals(BROADCAST_PAUSE)) {
+		        	PlayerActivity.currentActivity.stopService(new Intent(currentContext, PlayerService.class));
+		        }
+		    }
+		};
+		IntentFilter filter = new IntentFilter();
+		filter.addAction(BROADCAST_PAUSE);
+		registerReceiver(receiver, filter);
 
 	}
 	
