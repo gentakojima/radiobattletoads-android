@@ -64,16 +64,16 @@ public class PlayerService extends Service implements Runnable {
         	mLibVLC = LibVLC.getInstance();
         	
         	// Set network caching (defaults to 1,5s)
-        	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(PlayerActivity.currentActivity);
+        	SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
             mLibVLC.setNetworkCaching(Integer.parseInt(preferences.getString("buffering", "1500")));
         	
         	// Unset verbose mode
             mLibVLC.setVerboseMode(true);
             
-        	mLibVLC.init(PlayerActivity.currentActivity);
+        	mLibVLC.init(this);
         } catch(LibVlcException e) {
             Log.d("RBT","Error initializing the libVLC multimedia framework!");
-            PlayerActivity.currentActivity.finish();
+            // TODO: Notify the user activity
         }
 
         // Load media list, clear it and add radio

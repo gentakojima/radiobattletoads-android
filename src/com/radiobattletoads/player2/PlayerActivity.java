@@ -28,10 +28,7 @@ import android.graphics.Bitmap;
 
 import android.support.v7.app.ActionBarActivity;
 
-public class PlayerActivity extends ActionBarActivity{
-	
-	public static PlayerActivity currentActivity = null;
-	public static Context currentContext;
+public class PlayerActivity extends ActionBarActivity {
 	
 	public final static int MESSAGE_PLAYERSTATUS = 1; 
 	public final static int MESSAGE_CURRENTPROGRAM = 2;
@@ -46,11 +43,6 @@ public class PlayerActivity extends ActionBarActivity{
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		
-		// Update current activity and context
-		currentActivity = this;
-		currentContext = this.getApplicationContext();
-		
 		// Paint activity
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.player_layout);
@@ -71,14 +63,14 @@ public class PlayerActivity extends ActionBarActivity{
 		Message m = new Message();
 		m.what = PlayerActivity.MESSAGE_PLAYERSTATUS;
 		m.arg1 = PlayerService.status;
-		PlayerActivity.currentActivity.messageHandler.sendMessage(m);
+		this.messageHandler.sendMessage(m);
 		
 		// Broadcast to receive notification actions
 		BroadcastReceiver receiver = new BroadcastReceiver() {
 		    @Override
 		    public void onReceive(Context context, Intent intent) {
 		        if (intent.getAction().equals(BROADCAST_PAUSE)) {
-		        	PlayerActivity.currentActivity.stopService(new Intent(currentContext, PlayerService.class));
+		        	PlayerActivity.this.stopService(new Intent(PlayerActivity.this, PlayerService.class));
 		        }
 		    }
 		};
@@ -100,12 +92,12 @@ public class PlayerActivity extends ActionBarActivity{
 	Handler messageHandler = new Handler(){@SuppressWarnings("deprecation")
 	public void handleMessage(Message m){
 			
-		TextView tv_status = (TextView)currentActivity.findViewById(R.id.playerStatus);
-		LinearLayout trackinfo_layout_container = (LinearLayout) currentActivity.findViewById(R.id.trackInfoLayout);
-		final float scale = currentContext.getResources().getDisplayMetrics().density;
-		LinearLayout bufferingLayout = (LinearLayout) currentActivity.findViewById(R.id.bufferingLayout);
-		Button playButton = (Button) currentActivity.findViewById(R.id.playbutton);
-		Button pauseButton = (Button) currentActivity.findViewById(R.id.pauseButton);
+		TextView tv_status = (TextView)findViewById(R.id.playerStatus);
+		LinearLayout trackinfo_layout_container = (LinearLayout) findViewById(R.id.trackInfoLayout);
+		final float scale = getResources().getDisplayMetrics().density;
+		LinearLayout bufferingLayout = (LinearLayout) findViewById(R.id.bufferingLayout);
+		Button playButton = (Button) findViewById(R.id.playbutton);
+		Button pauseButton = (Button) findViewById(R.id.pauseButton);
 		
 		switch(m.what){
 		case MESSAGE_PLAYERSTATUS:
@@ -160,11 +152,11 @@ public class PlayerActivity extends ActionBarActivity{
 				case DownloadCurrentinfo.DOWNLOADCURRENTINFO_UPDATED:
 					Log.d("RBT","Received downloaded info");
 					
-					LinearLayout trackinfo_layout = new LinearLayout(PlayerActivity.currentContext);
-					LinearLayout trackinfo_textlayout = new LinearLayout(PlayerActivity.currentContext);
-					ImageView trackinfo_image = new ImageView(PlayerActivity.currentContext);
-					TextView trackinfo_title = new TextView(PlayerActivity.currentContext);
-					TextView trackinfo_description = new TextView(PlayerActivity.currentContext);
+					LinearLayout trackinfo_layout = new LinearLayout(PlayerActivity.this.getApplicationContext());
+					LinearLayout trackinfo_textlayout = new LinearLayout(PlayerActivity.this.getApplicationContext());
+					ImageView trackinfo_image = new ImageView(PlayerActivity.this.getApplicationContext());
+					TextView trackinfo_title = new TextView(PlayerActivity.this.getApplicationContext());
+					TextView trackinfo_description = new TextView(PlayerActivity.this.getApplicationContext());
 					
 					trackinfo_layout.addView(trackinfo_image);
 					trackinfo_layout.addView(trackinfo_textlayout);
@@ -205,7 +197,7 @@ public class PlayerActivity extends ActionBarActivity{
 					break;
 				case DownloadCurrentinfo.DOWNLOADCURRENTINFO_FAILED:
 					Log.d("RBT","Not received downloaded info. Connection failed?");
-					LinearLayout trackinfoerror_layout = new LinearLayout(PlayerActivity.currentContext);
+					LinearLayout trackinfoerror_layout = new LinearLayout(PlayerActivity.this.getApplicationContext());
 					LayoutParams trackinfoerror_layout_params = new LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT,
 							getWindowManager().getDefaultDisplay().getWidth() / 3, 1.0f);
 					trackinfoerror_layout.setLayoutParams(trackinfoerror_layout_params);
@@ -213,7 +205,7 @@ public class PlayerActivity extends ActionBarActivity{
 					LayoutParams trackinfoerror_textlayout_params = new LayoutParams( LinearLayout.LayoutParams.MATCH_PARENT,
 							LinearLayout.LayoutParams.MATCH_PARENT);
 					trackinfoerror_textlayout_params.setMargins(20, 20, 20, 20);
-					TextView trackinfoerror_text = new TextView(PlayerActivity.currentContext);
+					TextView trackinfoerror_text = new TextView(PlayerActivity.this.getApplicationContext());
 					trackinfoerror_text.setTextSize((int) (12 * scale + 0.5f));
 					trackinfoerror_text.setGravity(Gravity.CENTER);
 					trackinfoerror_text.setText(R.string.cantdownloadinfo);
