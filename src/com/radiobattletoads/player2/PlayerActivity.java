@@ -2,6 +2,8 @@ package com.radiobattletoads.player2;
 
 import java.util.Timer;
 
+import com.radiobattletoads.player2.DownloadCurrentinfo.DownloadCurrentInfoListener;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -26,7 +28,7 @@ import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.support.v7.app.ActionBarActivity;
 
-public class PlayerActivity extends ActionBarActivity {
+public class PlayerActivity extends ActionBarActivity implements DownloadCurrentInfoListener {
 
 	public final static int MESSAGE_PLAYERSTATUS = 1;
 	public final static int MESSAGE_CURRENTPROGRAM = 2;
@@ -39,6 +41,8 @@ public class PlayerActivity extends ActionBarActivity {
 
 	public static final String BROADCAST_PAUSE = "broadcast_pause";
 
+	private LinearLayout trackinfo_layout_container;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		// Paint activity
@@ -48,13 +52,12 @@ public class PlayerActivity extends ActionBarActivity {
 		// Add timer to download current track info and initialize
 		status_trackinfo = STATUS_TRACKINFO_UNINITIALIZED;
 		timer = new Timer();
-		timer.schedule(new DownloadCurrentinfo(), 0, 18000);
+		timer.schedule(DownloadCurrentinfo.getTimerTask(this, this), 0, 18000);
 
 		// Initialize player looks and status
-		LayoutParams trackInfoParams = new LayoutParams(
-				LinearLayout.LayoutParams.MATCH_PARENT, getWindowManager()
-						.getDefaultDisplay().getWidth() / 3 + 40);
+		LayoutParams trackInfoParams = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, getWindowManager().getDefaultDisplay().getWidth() / 3 + 40);
 		findViewById(R.id.trackInfoLayout).setLayoutParams(trackInfoParams);
+		trackinfo_layout_container = (LinearLayout) findViewById(R.id.trackInfoLayout);
 		Message m = new Message();
 		m.what = PlayerActivity.MESSAGE_PLAYERSTATUS;
 		m.arg1 = PlayerService.status;
@@ -65,8 +68,7 @@ public class PlayerActivity extends ActionBarActivity {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				if (intent.getAction().equals(BROADCAST_PAUSE)) {
-					PlayerActivity.this.stopService(new Intent(
-							PlayerActivity.this, PlayerService.class));
+					PlayerActivity.this.stopService(new Intent(PlayerActivity.this, PlayerService.class));
 				}
 			}
 		};
@@ -149,44 +151,29 @@ public class PlayerActivity extends ActionBarActivity {
 				case DownloadCurrentinfo.DOWNLOADCURRENTINFO_UPDATED:
 					Log.d("RBT", "Received downloaded info");
 
-					LinearLayout trackinfo_layout = new LinearLayout(
-							PlayerActivity.this.getApplicationContext());
-					LinearLayout trackinfo_textlayout = new LinearLayout(
-							PlayerActivity.this.getApplicationContext());
-					ImageView trackinfo_image = new ImageView(
-							PlayerActivity.this.getApplicationContext());
-					TextView trackinfo_title = new TextView(
-							PlayerActivity.this.getApplicationContext());
-					TextView trackinfo_description = new TextView(
-							PlayerActivity.this.getApplicationContext());
+					LinearLayout trackinfo_layout = new LinearLayout(PlayerActivity.this.getApplicationContext());
+					LinearLayout trackinfo_textlayout = new LinearLayout(PlayerActivity.this.getApplicationContext());
+					ImageView trackinfo_image = new ImageView(PlayerActivity.this.getApplicationContext());
+					TextView trackinfo_title = new TextView(PlayerActivity.this.getApplicationContext());
+					TextView trackinfo_description = new TextView(PlayerActivity.this.getApplicationContext());
 
 					trackinfo_layout.addView(trackinfo_image);
 					trackinfo_layout.addView(trackinfo_textlayout);
 
-					LayoutParams trackinfo_image_params = new LayoutParams(
-							getWindowManager().getDefaultDisplay().getWidth() / 3,
-							getWindowManager().getDefaultDisplay().getWidth() / 3,
-							1.0f);
+					LayoutParams trackinfo_image_params = new LayoutParams(getWindowManager().getDefaultDisplay().getWidth() / 3, getWindowManager().getDefaultDisplay().getWidth() / 3, 1.0f);
 					trackinfo_image_params.setMargins(20, 20, 7, 20);
 					trackinfo_image.setLayoutParams(trackinfo_image_params);
 					trackinfo_image.setScaleType(ScaleType.FIT_CENTER);
 
-					LayoutParams trackinfo_textlayout_params = new LayoutParams(
-							2 * (getWindowManager().getDefaultDisplay()
-									.getWidth() / 3),
-							LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
+					LayoutParams trackinfo_textlayout_params = new LayoutParams(2 * (getWindowManager().getDefaultDisplay().getWidth() / 3), LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
 					trackinfo_textlayout_params.setMargins(7, 20, 20, 20);
-					trackinfo_textlayout
-							.setLayoutParams(trackinfo_textlayout_params);
+					trackinfo_textlayout.setLayoutParams(trackinfo_textlayout_params);
 
 					trackinfo_textlayout.setOrientation(LinearLayout.VERTICAL);
-					LayoutParams trackinfo_titledesc_params = new LayoutParams(
-							LinearLayout.LayoutParams.MATCH_PARENT,
-							LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
+					LayoutParams trackinfo_titledesc_params = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
 					trackinfo_title.setLayoutParams(trackinfo_titledesc_params);
 					trackinfo_textlayout.addView(trackinfo_title);
-					trackinfo_description
-							.setLayoutParams(trackinfo_titledesc_params);
+					trackinfo_description.setLayoutParams(trackinfo_titledesc_params);
 					trackinfo_textlayout.addView(trackinfo_description);
 
 					trackinfo_title.setTextSize((int) (12 * scale + 0.5f));
@@ -197,38 +184,26 @@ public class PlayerActivity extends ActionBarActivity {
 					trackinfo_description.setEllipsize(TruncateAt.END);
 
 					trackinfo_title.setText(m.getData().getString("title"));
-					trackinfo_description.setText(m.getData().getString(
-							"description"));
-					trackinfo_image.setImageBitmap((Bitmap) m.getData()
-							.getParcelable("artwork"));
+					trackinfo_description.setText(m.getData().getString("description"));
+					trackinfo_image.setImageBitmap((Bitmap) m.getData().getParcelable("artwork"));
 
 					trackinfo_layout_container.removeViewAt(0);
 					trackinfo_layout_container.addView(trackinfo_layout);
 
 					break;
 				case DownloadCurrentinfo.DOWNLOADCURRENTINFO_FAILED:
-					Log.d("RBT",
-							"Not received downloaded info. Connection failed?");
-					LinearLayout trackinfoerror_layout = new LinearLayout(
-							PlayerActivity.this.getApplicationContext());
-					LayoutParams trackinfoerror_layout_params = new LayoutParams(
-							LinearLayout.LayoutParams.MATCH_PARENT,
-							getWindowManager().getDefaultDisplay().getWidth() / 3,
-							1.0f);
-					trackinfoerror_layout
-							.setLayoutParams(trackinfoerror_layout_params);
+					Log.d("RBT", "Not received downloaded info. Connection failed?");
+					LinearLayout trackinfoerror_layout = new LinearLayout(PlayerActivity.this.getApplicationContext());
+					LayoutParams trackinfoerror_layout_params = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, getWindowManager().getDefaultDisplay().getWidth() / 3, 1.0f);
+					trackinfoerror_layout.setLayoutParams(trackinfoerror_layout_params);
 
-					LayoutParams trackinfoerror_textlayout_params = new LayoutParams(
-							LinearLayout.LayoutParams.MATCH_PARENT,
-							LinearLayout.LayoutParams.MATCH_PARENT);
+					LayoutParams trackinfoerror_textlayout_params = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
 					trackinfoerror_textlayout_params.setMargins(20, 20, 20, 20);
-					TextView trackinfoerror_text = new TextView(
-							PlayerActivity.this.getApplicationContext());
+					TextView trackinfoerror_text = new TextView(PlayerActivity.this.getApplicationContext());
 					trackinfoerror_text.setTextSize((int) (12 * scale + 0.5f));
 					trackinfoerror_text.setGravity(Gravity.CENTER);
 					trackinfoerror_text.setText(R.string.cantdownloadinfo);
-					trackinfoerror_text
-							.setLayoutParams(trackinfoerror_textlayout_params);
+					trackinfoerror_text.setLayoutParams(trackinfoerror_textlayout_params);
 
 					trackinfoerror_layout.addView(trackinfoerror_text);
 					trackinfo_layout_container.removeViewAt(0);
@@ -259,8 +234,7 @@ public class PlayerActivity extends ActionBarActivity {
 			 */
 			return true;
 		case R.id.action_settings:
-			Intent intent = new Intent(PlayerActivity.this,
-					PreferencesActivity.class);
+			Intent intent = new Intent(PlayerActivity.this, PreferencesActivity.class);
 			PlayerActivity.this.startActivity(intent);
 			return true;
 		default:
@@ -286,6 +260,81 @@ public class PlayerActivity extends ActionBarActivity {
 
 		}
 
+	}
+
+	@Override
+	public void onPlayingInformationChange(NowPlayingInfo newInfo) {
+		if (this.isFinishing()) {
+			return;
+		}
+		Log.d("RBT", "Received downloaded info");
+		
+		final float scale = getResources().getDisplayMetrics().density;
+
+		LinearLayout trackinfo_layout = new LinearLayout(PlayerActivity.this.getApplicationContext());
+		LinearLayout trackinfo_textlayout = new LinearLayout(PlayerActivity.this.getApplicationContext());
+		ImageView trackinfo_image = new ImageView(PlayerActivity.this.getApplicationContext());
+		TextView trackinfo_title = new TextView(PlayerActivity.this.getApplicationContext());
+		TextView trackinfo_description = new TextView(PlayerActivity.this.getApplicationContext());
+
+		trackinfo_layout.addView(trackinfo_image);
+		trackinfo_layout.addView(trackinfo_textlayout);
+
+		LayoutParams trackinfo_image_params = new LayoutParams(getWindowManager().getDefaultDisplay().getWidth() / 3, getWindowManager().getDefaultDisplay().getWidth() / 3, 1.0f);
+		trackinfo_image_params.setMargins(20, 20, 7, 20);
+		trackinfo_image.setLayoutParams(trackinfo_image_params);
+		trackinfo_image.setScaleType(ScaleType.FIT_CENTER);
+
+		LayoutParams trackinfo_textlayout_params = new LayoutParams(2 * (getWindowManager().getDefaultDisplay().getWidth() / 3), LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
+		trackinfo_textlayout_params.setMargins(7, 20, 20, 20);
+		trackinfo_textlayout.setLayoutParams(trackinfo_textlayout_params);
+
+		trackinfo_textlayout.setOrientation(LinearLayout.VERTICAL);
+		LayoutParams trackinfo_titledesc_params = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
+		trackinfo_title.setLayoutParams(trackinfo_titledesc_params);
+		trackinfo_textlayout.addView(trackinfo_title);
+		trackinfo_description.setLayoutParams(trackinfo_titledesc_params);
+		trackinfo_textlayout.addView(trackinfo_description);
+
+		trackinfo_title.setTextSize((int) (12 * scale + 0.5f));
+		trackinfo_title.setGravity(Gravity.BOTTOM);
+		trackinfo_description.setTextSize((int) (9 * scale + 0.5f));
+		trackinfo_description.setGravity(Gravity.TOP);
+		trackinfo_description.setMaxLines(2);
+		trackinfo_description.setEllipsize(TruncateAt.END);
+
+		trackinfo_title.setText(newInfo.track_title);
+		trackinfo_description.setText(newInfo.track_description);
+		trackinfo_image.setImageBitmap(newInfo.artwork_image);
+
+		trackinfo_layout_container.removeViewAt(0);
+		trackinfo_layout_container.addView(trackinfo_layout);
+	}
+
+	@Override
+	public void onPlayingInformationDownloadError() {
+		if (this.isFinishing()) {
+			return;
+		}
+		Log.d("RBT", "Not received downloaded info. Connection failed?");
+		
+		final float scale = getResources().getDisplayMetrics().density;
+		
+		LinearLayout trackinfoerror_layout = new LinearLayout(PlayerActivity.this.getApplicationContext());
+		LayoutParams trackinfoerror_layout_params = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, getWindowManager().getDefaultDisplay().getWidth() / 3, 1.0f);
+		trackinfoerror_layout.setLayoutParams(trackinfoerror_layout_params);
+
+		LayoutParams trackinfoerror_textlayout_params = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT);
+		trackinfoerror_textlayout_params.setMargins(20, 20, 20, 20);
+		TextView trackinfoerror_text = new TextView(PlayerActivity.this.getApplicationContext());
+		trackinfoerror_text.setTextSize((int) (12 * scale + 0.5f));
+		trackinfoerror_text.setGravity(Gravity.CENTER);
+		trackinfoerror_text.setText(R.string.cantdownloadinfo);
+		trackinfoerror_text.setLayoutParams(trackinfoerror_textlayout_params);
+
+		trackinfoerror_layout.addView(trackinfoerror_text);
+		trackinfo_layout_container.removeViewAt(0);
+		trackinfo_layout_container.addView(trackinfoerror_layout);
 	}
 
 }
