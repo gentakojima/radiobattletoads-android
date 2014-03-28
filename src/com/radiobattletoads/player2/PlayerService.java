@@ -101,10 +101,10 @@ public class PlayerService extends Service implements Runnable {
 		// Show or hide notification
 		switch(PlayerService.status){
 		case PLAYER_PLAYING:
-			Notifications.addNotification();
+			RBTPlayerApplication.getFromContext(this).getNotifications().addNotification();
 			break;
 		case PLAYER_UNINITIALIZED:
-			Notifications.removeNotification();
+			RBTPlayerApplication.getFromContext(this).getNotifications().removeNotification();
 			break;
 		}
 		
