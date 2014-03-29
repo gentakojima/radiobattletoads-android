@@ -2,7 +2,6 @@ package com.radiobattletoads.player2;
 
 import android.content.Context;
 import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 
 public abstract class NetworkStatus {
 
