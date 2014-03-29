@@ -16,212 +16,202 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
-import android.os.Bundle;
-import android.os.Message;
+import android.os.AsyncTask;
 import android.util.Log;
 
+public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 
-public class DownloadCurrentinfo extends TimerTask {
-	
 	public final static int DOWNLOADCURRENTINFO_NEW = 1;
-	public final static int DOWNLOADCURRENTINFO_DOWNLOADING = 2; 
+	public final static int DOWNLOADCURRENTINFO_DOWNLOADING = 2;
 	public final static int DOWNLOADCURRENTINFO_UPDATED = 3;
 	public final static int DOWNLOADCURRENTINFO_IDLE = 4;
 	public final static int DOWNLOADCURRENTINFO_FAILED = 5;
-	
-	public static String track_title;
-	public static String track_description;
-	public static String artwork_url;
-	public static Bitmap artwork_image;
 
-	public static int status;
+	private static String track_title;
+	private static String track_description;
+	private static String artwork_url;
+	private static Bitmap artwork_image;
 
-	public DownloadCurrentinfo() {
-		super();
-		DownloadCurrentinfo.status = DOWNLOADCURRENTINFO_NEW;		
+	private Context context;
+	private DownloadCurrentInfoListener listener = null;
+
+	public DownloadCurrentinfo(Context context, DownloadCurrentInfoListener listener) {
+		this.context = context;
+		this.listener = listener;
 	}
 
-	public void sendToActivity(){
-		Log.d("RBT","Sending current info to activity");
-		if(PlayerActivity.currentActivity==null) return;
-		Message m = new Message();
-		if(track_title!=null){
-			m.what = PlayerActivity.MESSAGE_CURRENTPROGRAM;
-			m.arg1 = DOWNLOADCURRENTINFO_UPDATED; // FIXME enviar siempre?
-			Bundle data = new Bundle();
-			data.putString("title", track_title);
-			if(track_description!=null) data.putString("description", track_description);
-			if(artwork_image!=null) data.putParcelable("artwork", artwork_image);
-			m.setData(data);
-			PlayerActivity.currentActivity.messageHandler.sendMessage(m);
-		}
-		else{
-			// TODO do something? This path should never be reached
-		}
-	}
-	
-	private boolean downloadInfo(){
-		Log.d("RBT","Downloading info");
-		
-		if(NetworkStatus.getStatus(PlayerActivity.currentContext)==NetworkStatus.NETWORK_DISCONNECTED){
+	private boolean downloadInfo() {
+		Log.d("RBT", "Downloading info");
+
+		if (NetworkStatus.getStatus(this.context) == NetworkStatus.NETWORK_DISCONNECTED) {
 			return false;
 		}
-		
+
 		HttpClient hc = new DefaultHttpClient();
-    	HttpGet hg = new HttpGet("http://www.radiobattletoads.com/api/calendario.php?ahora=1&calendario=0");
-    	
-    	try {
-    		
-    		HttpResponse hr = hc.execute(hg);
+		HttpGet hg = new HttpGet("http://www.radiobattletoads.com/api/calendario.php?ahora=1&calendario=0");
+
+		try {
+
+			HttpResponse hr = hc.execute(hg);
 			InputStream is = hr.getEntity().getContent();
-			
+
 			Document document;
 			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder builder = null;
-			
+
 			try {
-			    builder = builderFactory.newDocumentBuilder();
+				builder = builderFactory.newDocumentBuilder();
 			} catch (ParserConfigurationException e) {
 				e.printStackTrace();
 				// TODO handle this exception
-				Log.d("RBT","Exception downloading ParserConfigurationException :( " + e.getMessage());
+				Log.d("RBT", "Exception downloading ParserConfigurationException :( " + e.getMessage());
 				return false;
 			}
-			
+
 			try {
-			    document = builder.parse(is);
+				document = builder.parse(is);
 			} catch (SAXException e) {
-			    e.printStackTrace();
-			    // TODO handle this exception
-			    Log.d("RBT","Exception downloading SAXException :( " + e.getMessage());
+				e.printStackTrace();
+				// TODO handle this exception
+				Log.d("RBT", "Exception downloading SAXException :( " + e.getMessage());
 				return false;
 			} catch (IOException e) {
-			    e.printStackTrace();
-			    // TODO handle this exception
-			    Log.d("RBT","Exception downloading IOException :( " + e.getMessage());
+				e.printStackTrace();
+				// TODO handle this exception
+				Log.d("RBT", "Exception downloading IOException :( " + e.getMessage());
 				return false;
 			}
 
 			NodeList nodes = document.getElementsByTagName("programa");
 			String track_title_new = nodes.item(0).getFirstChild().getNodeValue();
-			
+
 			nodes = document.getElementsByTagName("episodio");
 			String track_description_new = null;
-			try{
+			try {
 				track_description_new = nodes.item(0).getFirstChild().getNodeValue();
-			}
-			catch(NullPointerException e){
+			} catch (NullPointerException e) {
 				// TODO no episode name, do something?
 			}
-			
+
 			nodes = document.getElementsByTagName("icono");
 			String new_artwork_url = nodes.item(0).getFirstChild().getNodeValue();
-			
-			if(track_title==null || track_title_new.compareTo(track_title)!=0 || (track_description==null && track_description_new!=null) || (track_description_new!=null && track_description_new.compareTo(track_description)!=0)){
-				Log.d("RBT","Different title and desc! " + track_title_new + "!=" + track_title + " OR " + track_description_new + "!=" + track_description);
+
+			if (track_title == null || track_title_new.compareTo(track_title) != 0 || (track_description == null && track_description_new != null) || (track_description_new != null && track_description_new.compareTo(track_description) != 0)) {
+				Log.d("RBT", "Different title and desc! " + track_title_new + "!=" + track_title + " OR " + track_description_new + "!=" + track_description);
 				track_title = track_title_new;
 				track_description = track_description_new;
-				if(artwork_url==null || new_artwork_url.compareTo(artwork_url)!=0){
+				if (artwork_url == null || new_artwork_url.compareTo(artwork_url) != 0) {
 					artwork_url = new_artwork_url;
 					downloadArtwork();
 				}
-			    return true;
-			}
-			else{
-				Log.d("RBT","Same title and desc!");
+				return true;
+			} else {
+				Log.d("RBT", "Same title and desc!");
 				return false;
 			}
-			
-    	} catch (Exception e) {
-    		Log.d("RBT","Exception downloading :( " + e.getClass() + "---" + e.getMessage());
+
+		} catch (Exception e) {
+			Log.d("RBT", "Exception downloading :( " + e.getClass() + "---" + e.getMessage());
 			// TODO handle this exception. DON'T RETUN TRUE!
-			return true; 
+			return true;
 		}
 
-    }
-	
-	private boolean downloadArtwork(){
-		Log.d("RBT","Downloading artwork");
-		if(artwork_url==null){
+	}
+
+	private boolean downloadArtwork() {
+		Log.d("RBT", "Downloading artwork");
+		if (artwork_url == null) {
 			return false;
 		}
-	   	HttpClient hc = new DefaultHttpClient();
-	   	String ALLOWED_URI_CHARS = "@#&=*+-_.,:!?()/~'%";
-	   	artwork_url = Uri.encode(artwork_url, ALLOWED_URI_CHARS);
-    	HttpGet hg = new HttpGet(artwork_url);
-    	try {
+		HttpClient hc = new DefaultHttpClient();
+		String ALLOWED_URI_CHARS = "@#&=*+-_.,:!?()/~'%";
+		artwork_url = Uri.encode(artwork_url, ALLOWED_URI_CHARS);
+		HttpGet hg = new HttpGet(artwork_url);
+		try {
 			HttpResponse hr = hc.execute(hg);
-			if(hr.getStatusLine().getStatusCode()==404){
+			if (hr.getStatusLine().getStatusCode() == 404) {
 				// TODO handle 404s (shouldn't exist, but...)
-				Log.d("RBT","Exception downloading image - not found :( ");
+				Log.d("RBT", "Exception downloading image - not found :( ");
 				return false;
-			}
-			else{
+			} else {
 				InputStream is = hr.getEntity().getContent();
 				artwork_image = BitmapFactory.decodeStream(is);
-				if(artwork_image == null){
-					Log.d("RBT","Exception downloading image - trash :( ");
+				if (artwork_image == null) {
+					Log.d("RBT", "Exception downloading image - trash :( ");
 					// TODO handle downloading trash
 					return false;
 				}
 			}
 		} catch (IOException e) {
-			Log.d("RBT","Exception downloading image :( " + e.getMessage());
+			Log.d("RBT", "Exception downloading image :( " + e.getMessage());
 			// TODO handle can't download
 			return false;
 		}
-    	
-    	return true;
-		
-    }
-	
+
+		return true;
+
+	}
+
+	/*
+	 * @Override public void run() { if (downloadInfo() ||
+	 * (PlayerActivity.currentActivity != null &&
+	 * PlayerActivity.currentActivity.status_trackinfo ==
+	 * PlayerActivity.STATUS_TRACKINFO_UNINITIALIZED)) { Log.d("RBT",
+	 * "Downloadinfo returned true or initializing");
+	 * PlayerActivity.currentActivity.status_trackinfo =
+	 * PlayerActivity.STATUS_TRACKINFO_INITIALIZED; sendToActivity(); // Update
+	 * notification? if (PlayerService.status == PlayerService.PLAYER_PLAYING) {
+	 * Notifications.updateNotification(); } } else { Log.d("RBT",
+	 * "Downloadinfo returned FALSE"); if (track_title == null) { Message m =
+	 * new Message(); m.what = PlayerActivity.MESSAGE_CURRENTPROGRAM; m.arg1 =
+	 * DOWNLOADCURRENTINFO_FAILED;
+	 * PlayerActivity.currentActivity.messageHandler.sendMessage(m); } } }
+	 */
+
 	@Override
-	public void run() {
-		if(downloadInfo() || (PlayerActivity.currentActivity!=null &&  PlayerActivity.currentActivity.status_trackinfo==PlayerActivity.STATUS_TRACKINFO_UNINITIALIZED)){
-			Log.d("RBT","Downloadinfo returned true or initializing");
-			PlayerActivity.currentActivity.status_trackinfo = PlayerActivity.STATUS_TRACKINFO_INITIALIZED;
-			sendToActivity();
-			// Update notification?
-			if(PlayerService.status==PlayerService.PLAYER_PLAYING){
-				Notifications.updateNotification();
-			}
-		}
-		else{
-			Log.d("RBT","Downloadinfo returned FALSE");
-			if(track_title==null){
-				Message m = new Message();
-				m.what = PlayerActivity.MESSAGE_CURRENTPROGRAM;
-				m.arg1 = DOWNLOADCURRENTINFO_FAILED;
-				PlayerActivity.currentActivity.messageHandler.sendMessage(m);
+	protected Boolean doInBackground(String... params) {
+		// Non UI thread
+		return downloadInfo();
+	}
+
+	protected void onPostExecute(Boolean result) {
+		// UI thread (no need for a handler)
+		if (this.listener != null) {
+			if (result) {
+				NowPlayingInfo info = new NowPlayingInfo();
+				info.track_title = track_title;
+				info.track_description = track_description;
+				info.artwork_url = artwork_url;
+				info.artwork_image = artwork_image;
+				RBTPlayerApplication.getFromContext(context).setCachedNowPlayingInfo(info);
+				listener.onPlayingInformationChange(info);
+			} else {
+				listener.onPlayingInformationDownloadError();
 			}
 		}
 	}
-	
-	public static String getCurrentInfo(){
-		if(track_title != null && track_description != null){
-			return track_title + " - " + track_description;
-		}
-		else if(track_title != null){
-			return track_title;
-		}
-		else{
-			return "";
-		}
+
+	public static interface DownloadCurrentInfoListener {
+		// List of methods reflecting task results
+		void onPlayingInformationChange(NowPlayingInfo newInfo);
+
+		void onPlayingInformationDownloadError();
 	}
-	
-	public static Bitmap getCurrentArtwork(){
-		if(artwork_image!=null){
-			return artwork_image;
-		}
-		else{
-			return BitmapFactory.decodeResource(PlayerActivity.currentContext.getResources(),R.drawable.ic_launcher);
-		}
+
+	public static TimerTask getTimerTask(final Context context, final DownloadCurrentInfoListener listener) {
+		return new TimerTask() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				DownloadCurrentinfo task = new DownloadCurrentinfo(context, listener);
+				task.execute();
+			}
+		};
 	}
 
 }
-
-
