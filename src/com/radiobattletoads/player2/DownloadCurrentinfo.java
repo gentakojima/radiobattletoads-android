@@ -188,6 +188,7 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 				info.artwork_url = artwork_url;
 				info.artwork_image = artwork_image;
 				RBTPlayerApplication.getFromContext(context).setCachedNowPlayingInfo(info);
+				RBTPlayerApplication.getFromContext(context).getNotifications().updateNotification();
 				listener.onPlayingInformationChange(info);
 			} else {
 				if(track_title==null){
