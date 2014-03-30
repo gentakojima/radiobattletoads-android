@@ -43,6 +43,8 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 	private LinearLayout bufferingLayout;
 	private Button playButton;
 	private Button pauseButton;
+	
+	private BroadcastReceiver receiver;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -93,7 +95,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		}
 
 		// Broadcast to receive notification actions
-		BroadcastReceiver receiver = new BroadcastReceiver() {
+		receiver = new BroadcastReceiver() {
 			@Override
 			public void onReceive(Context context, Intent intent) {
 				if (intent.getAction().equals(BROADCAST_PAUSE)) {
@@ -111,7 +113,17 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		super.onDestroy();
 		PlayerService.unRegister(this);
 	}
-
+	
+	@Override
+	public void onStop() {
+		try{
+			unregisterReceiver(receiver);
+		}catch(IllegalArgumentException e){
+			// Okay, receiver was not registered. Easy there.
+		}
+		super.onStop();
+	}
+	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu items for use in the action bar
