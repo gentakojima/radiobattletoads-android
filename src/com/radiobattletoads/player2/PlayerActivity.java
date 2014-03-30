@@ -30,7 +30,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 	public final static int MESSAGE_PLAYERSTATUS = 1;
 	public final static int MESSAGE_CURRENTPROGRAM = 2;
 
-	private Timer timer;
+	private Timer downloadinfoTimer;
 
 	public static final int STATUS_TRACKINFO_UNINITIALIZED = 1;
 	public static final int STATUS_TRACKINFO_INITIALIZED = 2;
@@ -55,8 +55,10 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 
 		// Add timer to download current track info and initialize
 		status_trackinfo = STATUS_TRACKINFO_UNINITIALIZED;
-		timer = new Timer();
-		timer.schedule(DownloadCurrentinfo.getTimerTask(this, this), 0, 18000);
+		if(downloadinfoTimer==null){
+			downloadinfoTimer = new Timer();
+			downloadinfoTimer.schedule(DownloadCurrentinfo.getTimerTask(this, this), 0, 18000);
+		}
 
 		// Initialize player looks and status
 		LayoutParams trackInfoParams = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, getWindowManager().getDefaultDisplay().getWidth() / 3 + 40);
@@ -110,12 +112,14 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 	
 	@Override
 	public void onDestroy() {
+		Log.d("RBT","Called onDestroy");
 		super.onDestroy();
 		PlayerService.unRegister(this);
 	}
 	
 	@Override
 	public void onStop() {
+		Log.d("RBT","Called onStop");
 		try{
 			unregisterReceiver(receiver);
 		}catch(IllegalArgumentException e){
