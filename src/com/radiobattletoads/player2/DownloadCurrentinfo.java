@@ -190,7 +190,9 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 				RBTPlayerApplication.getFromContext(context).setCachedNowPlayingInfo(info);
 				listener.onPlayingInformationChange(info);
 			} else {
-				listener.onPlayingInformationDownloadError();
+				if(track_title==null){
+					listener.onPlayingInformationDownloadError();
+				}
 			}
 		}
 	}
