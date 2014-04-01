@@ -208,6 +208,9 @@ public class PlayerService extends Service implements Runnable {
 				}
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
+			} catch (NullPointerException e) {
+				 // Player is dead most probably by a pause button press, get out of here
+				 return;
 			}
 		}
 		if (status == PLAYER_PLAYING && !mLibVLC.isPlaying()) {
@@ -251,6 +254,8 @@ public class PlayerService extends Service implements Runnable {
 	public void onDestroy() {
 		// this.stopSelf(); // This is redundant, I'm already dying. Let me die in peace.
 		super.onDestroy();
+		this.stop();
+		this.destroy();
 		PlayerService.instance = null;
 		Log.d("RBT", "Service destroyed!");
 	}

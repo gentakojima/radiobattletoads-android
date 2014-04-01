@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 
@@ -23,6 +24,10 @@ public class Notifications {
 	}
 
 	public boolean addNotification() {
+		
+		// Check preference
+		Boolean enabled = PreferenceManager.getDefaultSharedPreferences(this.context).getBoolean("notification", true);
+		if(!enabled) return false;		
 
 		// Build the intents
 		Intent in = new Intent(this.context, PlayerActivity.class);
@@ -84,8 +89,18 @@ public class Notifications {
 	}
 
 	public boolean removeNotification() {
-
 		notificationManager.cancelAll();
+		return true;
+	}
+	
+	
+	public boolean disable(){
+		this.removeNotification();
+		return true;
+	}
+	
+	public boolean enable(){
+		
 		return true;
 	}
 

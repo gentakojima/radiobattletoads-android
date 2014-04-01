@@ -11,4 +11,9 @@
     <string name="cantdownloadinfo">Can\'t download current track info. Please check your connection.</string>
     <string name="preferences_title">Preferences</string>
     <string name="preferences_network">Network</string>
+    <string name="preferences_behaviour">Behaviour</string>
+    <string name="preferences_notifications">Enable notifications</string>
+    <string name="preferences_notifications_desc">Will be shown when the radio is being played</string>
+    <string name="preferences_buffering_warning_minimum">Buffering minimum value is 500ms. The minimum value has been set.</string>
+    <string name="preferences_buffering_warning_maximum">Buffering maximum value is 20000ms. The maximum value has been set.</string>
 </resources>

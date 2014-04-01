@@ -2,7 +2,7 @@
 <PreferenceScreen
   xmlns:android="http://schemas.android.com/apk/res/android" android:title="@string/preferences_title">
     <PreferenceCategory android:title="@string/preferences_network">
-        <com.radiobattletoads.player2.EditTextPreference 
+        <com.radiobattletoads.player2.EditBufferPreference 
     android:id="@+id/preferences_description"
     android:defaultValue="1500" 
     android:key="buffering" 
@@ -10,5 +10,12 @@
     android:inputType="number"
     android:summary="% milliseconds"
     />  
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/preferences_behaviour">
+        <CheckBoxPreference
+    android:key="notification"
+    android:title="@string/preferences_notifications"
+    android:summary="@string/preferences_notifications_desc"
+    android:defaultValue="true" />
     </PreferenceCategory>
 </PreferenceScreen>
