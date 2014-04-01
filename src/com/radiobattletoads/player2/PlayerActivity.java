@@ -1,11 +1,6 @@
 package com.radiobattletoads.player2;
 
-import java.util.Timer;
-
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils.TruncateAt;
@@ -30,8 +25,6 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 	public final static int MESSAGE_PLAYERSTATUS = 1;
 	public final static int MESSAGE_CURRENTPROGRAM = 2;
 
-	private Timer downloadinfoTimer;
-
 	public static final int STATUS_TRACKINFO_UNINITIALIZED = 1;
 	public static final int STATUS_TRACKINFO_INITIALIZED = 2;
 	public int status_trackinfo;
@@ -43,8 +36,6 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 	private LinearLayout bufferingLayout;
 	private Button playButton;
 	private Button pauseButton;
-	
-	private BroadcastReceiver receiver;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,13 +43,10 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.player_layout);
 		PlayerService.register(this);
+		DownloadCurrentinfo.register(this);
 
 		// Add timer to download current track info and initialize
 		status_trackinfo = STATUS_TRACKINFO_UNINITIALIZED;
-		if(downloadinfoTimer==null){
-			downloadinfoTimer = new Timer();
-			downloadinfoTimer.schedule(DownloadCurrentinfo.getTimerTask(this, this), 0, 18000);
-		}
 
 		// Initialize player looks and status
 		LayoutParams trackInfoParams = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, getWindowManager().getDefaultDisplay().getWidth() / 3 + 40);
@@ -96,18 +84,8 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 			break;
 		}
 
-		// Broadcast to receive notification actions
-		receiver = new BroadcastReceiver() {
-			@Override
-			public void onReceive(Context context, Intent intent) {
-				if (intent.getAction().equals(BROADCAST_PAUSE)) {
-					PlayerActivity.this.stopService(new Intent(PlayerActivity.this, PlayerService.class));
-				}
-			}
-		};
-		IntentFilter filter = new IntentFilter();
-		filter.addAction(BROADCAST_PAUSE);
-		registerReceiver(receiver, filter);
+		// Launch first DownloadCurrentInfo Task
+		DownloadCurrentinfo.getTimerTask(this).run();
 	}
 	
 	@Override
@@ -115,17 +93,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		Log.d("RBT","Called onDestroy");
 		super.onDestroy();
 		PlayerService.unRegister(this);
-	}
-	
-	@Override
-	public void onStop() {
-		Log.d("RBT","Called onStop");
-		try{
-			unregisterReceiver(receiver);
-		}catch(IllegalArgumentException e){
-			// Okay, receiver was not registered. Easy there.
-		}
-		super.onStop();
+		DownloadCurrentinfo.unRegister(this);
 	}
 	
 	@Override
@@ -167,7 +135,9 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 			if (PlayerService.getInstance() == null) {
 				// Initialize and play!
 				Log.d("RBT", "Play");
-				this.startService(new Intent(this, PlayerService.class));
+				Intent intt = new Intent(this, PlayerService.class);
+				intt.setAction(PlayerService.ACTION_START);
+				this.startService(intt);
 			} else {
 				// Radio is playing, stop!
 				Log.d("RBT", "Stop");
