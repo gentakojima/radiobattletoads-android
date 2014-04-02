@@ -20,6 +20,8 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import com.radiobattletoads.player2.PlayerService.PlayerStatusChangeListener;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.apache.OkApacheClient;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -54,6 +56,8 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 	private static String track_description;
 	private static String artwork_url;
 	private static Bitmap artwork_image;
+	
+	protected static final HttpClient sHttpClient = new OkApacheClient();
 
 	private Context context;
 
@@ -68,12 +72,11 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 			return false;
 		}
 
-		HttpClient hc = new DefaultHttpClient();
 		HttpGet hg = new HttpGet("http://www.radiobattletoads.com/api/calendario.php?ahora=1&calendario=0");
 
 		try {
 
-			HttpResponse hr = hc.execute(hg);
+			HttpResponse hr = sHttpClient.execute(hg);
 			InputStream is = hr.getEntity().getContent();
 
 			Document document;
@@ -172,22 +175,6 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 		return true;
 
 	}
-
-	/*
-	 * @Override public void run() { if (downloadInfo() ||
-	 * (PlayerActivity.currentActivity != null &&
-	 * PlayerActivity.currentActivity.status_trackinfo ==
-	 * PlayerActivity.STATUS_TRACKINFO_UNINITIALIZED)) { Log.d("RBT",
-	 * "Downloadinfo returned true or initializing");
-	 * PlayerActivity.currentActivity.status_trackinfo =
-	 * PlayerActivity.STATUS_TRACKINFO_INITIALIZED; sendToActivity(); // Update
-	 * notification? if (PlayerService.status == PlayerService.PLAYER_PLAYING) {
-	 * Notifications.updateNotification(); } } else { Log.d("RBT",
-	 * "Downloadinfo returned FALSE"); if (track_title == null) { Message m =
-	 * new Message(); m.what = PlayerActivity.MESSAGE_CURRENTPROGRAM; m.arg1 =
-	 * DOWNLOADCURRENTINFO_FAILED;
-	 * PlayerActivity.currentActivity.messageHandler.sendMessage(m); } } }
-	 */
 
 	@Override
 	protected Boolean doInBackground(String... params) {
