@@ -12,11 +12,13 @@ public class RBTPlayerApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		this.notifications = new Notifications(this);
+		this.notifications.onCreate();
 	}
 
 	@Override
 	public void onTerminate() {
 		super.onTerminate();
+		this.notifications.onDestroy();
 	}
 
 	public Notifications getNotifications() {

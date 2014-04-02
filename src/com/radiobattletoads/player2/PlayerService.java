@@ -138,13 +138,11 @@ public class PlayerService extends Service implements Runnable {
 				downloadinfoTimer = new Timer();
 				downloadinfoTimer.schedule(DownloadCurrentinfo.getTimerTask(this), 0, 18000);
 			}
-			RBTPlayerApplication.getFromContext(this).getNotifications().addNotification();
 			break;
 		case PLAYER_UNINITIALIZED:
 			if(downloadinfoTimer!=null){
 				downloadinfoTimer.cancel();
 			}
-			RBTPlayerApplication.getFromContext(this).getNotifications().removeNotification();
 			break;
 		}
 

@@ -83,9 +83,6 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 			this.onPlayerReady();
 			break;
 		}
-
-		// Launch first DownloadCurrentInfo Task
-		DownloadCurrentinfo.getTimerTask(this).run();
 	}
 	
 	@Override
@@ -94,6 +91,19 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		super.onDestroy();
 		PlayerService.unRegister(this);
 		DownloadCurrentinfo.unRegister(this);
+	}
+	
+	@Override
+	public void onResume() {
+		super.onResume();
+		
+		// Launch first DownloadCurrentInfo Task
+		NowPlayingInfo npi = RBTPlayerApplication.getFromContext(this).getCachedNowPlayingInfo();
+		if (npi == null) {
+			DownloadCurrentinfo.getTimerTask(this).run();
+		} else {
+			this.onPlayingInformationChange(npi);
+		}
 	}
 	
 	@Override

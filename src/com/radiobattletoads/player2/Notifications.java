@@ -17,9 +17,10 @@ import android.support.v4.app.NotificationCompat.Builder;
 public class Notifications implements DownloadCurrentInfoListener, PlayerStatusChangeListener {
 
 	private NotificationManager notificationManager = null;
-	private Builder notif = null;
+	private Builder notifBuilder = null;
 	private Context context;
 	private boolean enabled = true;
+	private boolean showNowPlayingNotification = false;
 
 	public Notifications(Context context) {
 		this.context = context;
@@ -27,8 +28,20 @@ public class Notifications implements DownloadCurrentInfoListener, PlayerStatusC
 		notificationManager = (NotificationManager) this.context.getSystemService(Context.NOTIFICATION_SERVICE);
 		
 		enabled = PreferenceManager.getDefaultSharedPreferences(this.context).getBoolean("notification", true);
-		
-		notif = new NotificationCompat.Builder(this.context)
+	}
+	
+	public void onCreate() {
+		DownloadCurrentinfo.register(this);
+		PlayerService.register(this);
+	}
+	
+	public void onDestroy() {
+		DownloadCurrentinfo.unRegister(this);
+		PlayerService.unRegister(this);
+	}
+	
+	private  Builder getNotificationBuilder() {
+		return new NotificationCompat.Builder(this.context)
 		.setContentTitle("Radio Battletoads")
 		.setSmallIcon(R.drawable.ic_launcher)
 		.setAutoCancel(true).setOngoing(true);
@@ -38,8 +51,7 @@ public class Notifications implements DownloadCurrentInfoListener, PlayerStatusC
 		
 		// Check preference
 		if(!enabled) return false;
-		
-		DownloadCurrentinfo.register(this);
+		showNowPlayingNotification = true;
 
 		// Build the intents
 		Intent in = new Intent(this.context, PlayerActivity.class);
@@ -54,19 +66,21 @@ public class Notifications implements DownloadCurrentInfoListener, PlayerStatusC
 		int notif_height = (int) res.getDimension(android.R.dimen.notification_large_icon_height);
 		int notif_width = (int) res.getDimension(android.R.dimen.notification_large_icon_width);
 
+		notifBuilder = getNotificationBuilder();
+		
 		NowPlayingInfo npi = RBTPlayerApplication.getFromContext(context).getCachedNowPlayingInfo();
 		if (npi == null) {
-			notif.setContentIntent(contentIntent)
+			notifBuilder.setContentIntent(contentIntent)
 			.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
 		} else {
 
 			Bitmap large_bitmap = Bitmap.createScaledBitmap(npi.getCurrentArtwork(context), notif_width, notif_height, false);
-			notif.setContentText(npi.toString())
+			notifBuilder.setContentText(npi.toString())
 					.setLargeIcon(large_bitmap)
 					.setContentIntent(contentIntent)
 					.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
 		}
-		Notification notifBuilt = notif.build();
+		Notification notifBuilt = notifBuilder.build();
 		notifBuilt.flags = Notification.FLAG_NO_CLEAR;
 
 		// Show the notification
@@ -77,7 +91,7 @@ public class Notifications implements DownloadCurrentInfoListener, PlayerStatusC
 
 	public boolean updateNotification() {
 
-		if (!enabled) {
+		if (!enabled || !showNowPlayingNotification) {
 			return false;
 		}
 		
@@ -86,14 +100,15 @@ public class Notifications implements DownloadCurrentInfoListener, PlayerStatusC
 			return false;
 		}
 
-		if (notif != null) {
+		// Reuse previuos notification builder
+		if (notifBuilder != null) {
 			Resources res = this.context.getResources();
 			int notif_height = (int) res.getDimension(android.R.dimen.notification_large_icon_height);
 			int notif_width = (int) res.getDimension(android.R.dimen.notification_large_icon_width);
 			Bitmap large_bitmap = Bitmap.createScaledBitmap(npi.getCurrentArtwork(this.context), notif_width, notif_height, false);
-			notif.setContentText(npi.toString());
-			notif.setLargeIcon(large_bitmap);
-			Notification notifBuilt = notif.build();
+			notifBuilder.setContentText(npi.toString());
+			notifBuilder.setLargeIcon(large_bitmap);
+			Notification notifBuilt = notifBuilder.build();
 			notifBuilt.flags = Notification.FLAG_NO_CLEAR;
 			// Show the notification
 			notificationManager.notify(0, notifBuilt);
@@ -104,6 +119,7 @@ public class Notifications implements DownloadCurrentInfoListener, PlayerStatusC
 	}
 
 	public boolean removeNotification() {
+		showNowPlayingNotification = false;
 		DownloadCurrentinfo.unRegister(this);
 		notificationManager.cancelAll();
 		return true;
