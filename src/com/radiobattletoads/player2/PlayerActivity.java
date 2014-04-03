@@ -36,6 +36,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 	private LinearLayout bufferingLayout;
 	private Button playButton;
 	private Button pauseButton;
+	private NowPlayingInfo currentDisplayedInfo = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +44,6 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.player_layout);
 		PlayerService.register(this);
-		DownloadCurrentinfo.register(this);
 
 		// Add timer to download current track info and initialize
 		status_trackinfo = STATUS_TRACKINFO_UNINITIALIZED;
@@ -90,20 +90,29 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		Log.d("RBT","Called onDestroy");
 		super.onDestroy();
 		PlayerService.unRegister(this);
-		DownloadCurrentinfo.unRegister(this);
+		
 	}
 	
 	@Override
 	public void onResume() {
 		super.onResume();
 		
-		// Launch first DownloadCurrentInfo Task
+		// Show cached "now playing info"
 		NowPlayingInfo npi = RBTPlayerApplication.getFromContext(this).getCachedNowPlayingInfo();
-		if (npi == null) {
-			DownloadCurrentinfo.getTimerTask(this).run();
-		} else {
+		if (npi != null && !npi.equals(currentDisplayedInfo)) {
 			this.onPlayingInformationChange(npi);
 		}
+		DownloadCurrentinfo.register(this);
+		// Start DownloadCurrentInfoTimer
+		RBTPlayerApplication.getFromContext(this).getDownloadCurrentInfoTimer().start();
+	}
+	
+	@Override
+	public void onPause() {
+		super.onPause();
+		DownloadCurrentinfo.unRegister(this);
+		// Stop DownloadCurrentInfoTimer
+		RBTPlayerApplication.getFromContext(this).getDownloadCurrentInfoTimer().stop();
 	}
 	
 	@Override
@@ -163,6 +172,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		if (this.isFinishing()) {
 			return;
 		}
+		this.currentDisplayedInfo = newInfo;
 		Log.d("RBT", "Received downloaded info");
 		
 		final float scale = getResources().getDisplayMetrics().density;

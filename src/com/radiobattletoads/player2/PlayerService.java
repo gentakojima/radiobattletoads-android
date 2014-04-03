@@ -57,10 +57,8 @@ public class PlayerService extends Service implements Runnable {
 	private LibVLC mLibVLC = null;
 	private int status = PLAYER_UNINITIALIZED;
 
-	private boolean sirThreadDiePleaseThankyou = false;
 	private Thread playerThread = null;
 	private PlayerServiceHandler myHandler = new PlayerServiceHandler(this);
-	private Timer downloadinfoTimer;
 
 	protected void play() {
 		// Play radio (assuming prepare was called before)
@@ -134,15 +132,10 @@ public class PlayerService extends Service implements Runnable {
 		// Show or hide notification
 		switch (status) {
 		case PLAYER_PLAYING:
-			if(downloadinfoTimer==null){
-				downloadinfoTimer = new Timer();
-				downloadinfoTimer.schedule(DownloadCurrentinfo.getTimerTask(this), 0, 18000);
-			}
+			RBTPlayerApplication.getFromContext(this).getDownloadCurrentInfoTimer().start();
 			break;
 		case PLAYER_UNINITIALIZED:
-			if(downloadinfoTimer!=null){
-				downloadinfoTimer.cancel();
-			}
+			RBTPlayerApplication.getFromContext(this).getDownloadCurrentInfoTimer().stop();
 			break;
 		}
 
