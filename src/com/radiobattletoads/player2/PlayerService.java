@@ -2,6 +2,7 @@ package com.radiobattletoads.player2;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Timer;
 
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.LibVlcException;
@@ -50,11 +51,12 @@ public class PlayerService extends Service implements Runnable {
 	public final static int PLAYER_PLAYING = 5;
 	public final static int PLAYER_CONNECTIONPROBLEM_NOTSTARTED = 11;
 	public final static int PLAYER_CONNECTIONPROBLEM_CUT = 12;
+	public final static String ACTION_START = "com.radiobattletoads.player2.PlayerService.start";
+	public final static String ACTION_STOP = "com.radiobattletoads.player2.PlayerService.stop";
 
 	private LibVLC mLibVLC = null;
 	private int status = PLAYER_UNINITIALIZED;
 
-	private boolean sirThreadDiePleaseThankyou = false;
 	private Thread playerThread = null;
 	private PlayerServiceHandler myHandler = new PlayerServiceHandler(this);
 
@@ -130,10 +132,10 @@ public class PlayerService extends Service implements Runnable {
 		// Show or hide notification
 		switch (status) {
 		case PLAYER_PLAYING:
-			RBTPlayerApplication.getFromContext(this).getNotifications().addNotification();
+			RBTPlayerApplication.getFromContext(this).getDownloadCurrentInfoTimer().start();
 			break;
 		case PLAYER_UNINITIALIZED:
-			RBTPlayerApplication.getFromContext(this).getNotifications().removeNotification();
+			RBTPlayerApplication.getFromContext(this).getDownloadCurrentInfoTimer().stop();
 			break;
 		}
 
@@ -235,10 +237,15 @@ public class PlayerService extends Service implements Runnable {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		playerThread = new Thread(this);
-		playerThread.start();
-		Log.d("RBT", "Service started!");
-		return START_STICKY;
+		if (playerThread == null && ACTION_START.equals(intent.getAction())) {
+			playerThread = new Thread(this);
+			playerThread.start();
+			Log.d("RBT", "Service started!");
+			return START_STICKY;
+		} else if (playerThread != null && ACTION_STOP.equals(intent.getAction())) {
+			this.stopSelf();
+		}
+		return START_NOT_STICKY;
 	}
 
 	@Override

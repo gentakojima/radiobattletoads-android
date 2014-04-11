@@ -2,6 +2,9 @@ package com.radiobattletoads.player2;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.TimerTask;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -16,6 +19,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import com.radiobattletoads.player2.PlayerService.PlayerStatusChangeListener;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.apache.OkApacheClient;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -25,6 +32,20 @@ import android.util.Log;
 
 public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 
+	static Boolean isRunning = Boolean.FALSE;
+	private static List<DownloadCurrentInfoListener> listeners = new ArrayList<DownloadCurrentInfoListener>();
+	public static void register(DownloadCurrentInfoListener listener) {
+		if (!listeners.contains(listener)) {
+			listeners.add(listener);
+		}
+	}
+	
+	public static void unRegister(DownloadCurrentInfoListener listener) {
+		if (listeners.contains(listener)) {
+			listeners.remove(listener);
+		}
+	}
+	
 	public final static int DOWNLOADCURRENTINFO_NEW = 1;
 	public final static int DOWNLOADCURRENTINFO_DOWNLOADING = 2;
 	public final static int DOWNLOADCURRENTINFO_UPDATED = 3;
@@ -35,13 +56,13 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 	private static String track_description;
 	private static String artwork_url;
 	private static Bitmap artwork_image;
+	
+	protected static final HttpClient sHttpClient = new OkApacheClient();
 
 	private Context context;
-	private DownloadCurrentInfoListener listener = null;
 
-	public DownloadCurrentinfo(Context context, DownloadCurrentInfoListener listener) {
+	public DownloadCurrentinfo(Context context) {
 		this.context = context;
-		this.listener = listener;
 	}
 
 	private boolean downloadInfo() {
@@ -51,12 +72,11 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 			return false;
 		}
 
-		HttpClient hc = new DefaultHttpClient();
 		HttpGet hg = new HttpGet("http://www.radiobattletoads.com/api/calendario.php?ahora=1&calendario=0");
 
 		try {
 
-			HttpResponse hr = hc.execute(hg);
+			HttpResponse hr = sHttpClient.execute(hg);
 			InputStream is = hr.getEntity().getContent();
 
 			Document document;
@@ -156,31 +176,17 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 
 	}
 
-	/*
-	 * @Override public void run() { if (downloadInfo() ||
-	 * (PlayerActivity.currentActivity != null &&
-	 * PlayerActivity.currentActivity.status_trackinfo ==
-	 * PlayerActivity.STATUS_TRACKINFO_UNINITIALIZED)) { Log.d("RBT",
-	 * "Downloadinfo returned true or initializing");
-	 * PlayerActivity.currentActivity.status_trackinfo =
-	 * PlayerActivity.STATUS_TRACKINFO_INITIALIZED; sendToActivity(); // Update
-	 * notification? if (PlayerService.status == PlayerService.PLAYER_PLAYING) {
-	 * Notifications.updateNotification(); } } else { Log.d("RBT",
-	 * "Downloadinfo returned FALSE"); if (track_title == null) { Message m =
-	 * new Message(); m.what = PlayerActivity.MESSAGE_CURRENTPROGRAM; m.arg1 =
-	 * DOWNLOADCURRENTINFO_FAILED;
-	 * PlayerActivity.currentActivity.messageHandler.sendMessage(m); } } }
-	 */
-
 	@Override
 	protected Boolean doInBackground(String... params) {
 		// Non UI thread
+		DownloadCurrentinfo.isRunning = Boolean.TRUE;
 		return downloadInfo();
 	}
 
 	protected void onPostExecute(Boolean result) {
 		// UI thread (no need for a handler)
-		if (this.listener != null) {
+		DownloadCurrentinfo.isRunning = Boolean.FALSE;
+		if (DownloadCurrentinfo.listeners.size() > 0) {
 			if (result) {
 				NowPlayingInfo info = new NowPlayingInfo();
 				info.track_title = track_title;
@@ -189,10 +195,14 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 				info.artwork_image = artwork_image;
 				RBTPlayerApplication.getFromContext(context).setCachedNowPlayingInfo(info);
 				RBTPlayerApplication.getFromContext(context).getNotifications().updateNotification();
-				listener.onPlayingInformationChange(info);
+				for (int i=0;i<DownloadCurrentinfo.listeners.size();i++) {
+					DownloadCurrentinfo.listeners.get(i).onPlayingInformationChange(info);
+				}
 			} else {
 				if(track_title==null){
-					listener.onPlayingInformationDownloadError();
+					for (int i=0;i<DownloadCurrentinfo.listeners.size();i++) {
+						DownloadCurrentinfo.listeners.get(i).onPlayingInformationDownloadError();
+					}
 				}
 			}
 		}
@@ -205,13 +215,16 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 		void onPlayingInformationDownloadError();
 	}
 
-	public static TimerTask getTimerTask(final Context context, final DownloadCurrentInfoListener listener) {
+	public static TimerTask getTimerTask(final Context context) {
 		return new TimerTask() {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
-				DownloadCurrentinfo task = new DownloadCurrentinfo(context, listener);
+				// If already running, skip launching a new task
+				if (DownloadCurrentinfo.isRunning) {
+					return;
+				}
+				DownloadCurrentinfo task = new DownloadCurrentinfo(context);
 				task.execute();
 			}
 		};
