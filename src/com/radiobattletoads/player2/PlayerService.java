@@ -2,7 +2,6 @@ package com.radiobattletoads.player2;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Timer;
 
 import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.LibVlcException;
@@ -110,7 +109,7 @@ public class PlayerService extends Service implements Runnable {
 		// Load media list, clear it and add radio
 		MediaList list = mLibVLC.getPrimaryMediaList();
 		list.clear();
-		list.add(LibVLC.PathToURI("http://live.radiobattletoads.com:443/saltxero.ogg"));
+		list.add(LibVLC.PathToURI("http://live.radiobattletoads.com:443/live_48kbps_opus.ogg"));
 
 		// Set current status
 		setStatusFromThread(PLAYER_READY);

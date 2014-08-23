@@ -1,26 +1,19 @@
 package com.radiobattletoads.player2;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TimerTask;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+import org.json.JSONObject;
 
-import com.radiobattletoads.player2.PlayerService.PlayerStatusChangeListener;
-import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.apache.OkApacheClient;
 
 import android.content.Context;
@@ -54,7 +47,7 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 
 	private static String track_title;
 	private static String track_description;
-	private static String artwork_url;
+	private static String artwork_url = "http://radiobattletoads.com/data/iconogrande-get.php";
 	private static Bitmap artwork_image;
 	
 	protected static final HttpClient sHttpClient = new OkApacheClient();
@@ -72,62 +65,30 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 			return false;
 		}
 
-		HttpGet hg = new HttpGet("http://www.radiobattletoads.com/api/calendario.php?ahora=1&calendario=0");
+		HttpGet hg = new HttpGet("http://radiobattletoads.com/data/emitiendo-get.php");
 
 		try {
-
 			HttpResponse hr = sHttpClient.execute(hg);
 			InputStream is = hr.getEntity().getContent();
-
-			Document document;
-			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder builder = null;
-
-			try {
-				builder = builderFactory.newDocumentBuilder();
-			} catch (ParserConfigurationException e) {
-				e.printStackTrace();
-				// TODO handle this exception
-				Log.d("RBT", "Exception downloading ParserConfigurationException :( " + e.getMessage());
-				return false;
+			InputStreamReader isr=new InputStreamReader(is);
+			BufferedReader br=new BufferedReader(isr);
+			String response = br.readLine();
+			JSONObject jsonEmitiendo = new JSONObject(response);
+			
+			String track_title_new;
+			try{
+				track_title_new = jsonEmitiendo.getString("nombre");
 			}
-
-			try {
-				document = builder.parse(is);
-			} catch (SAXException e) {
-				e.printStackTrace();
-				// TODO handle this exception
-				Log.d("RBT", "Exception downloading SAXException :( " + e.getMessage());
-				return false;
-			} catch (IOException e) {
-				e.printStackTrace();
-				// TODO handle this exception
-				Log.d("RBT", "Exception downloading IOException :( " + e.getMessage());
-				return false;
+			catch(Exception e){
+				track_title_new = "Continuidad";
 			}
-
-			NodeList nodes = document.getElementsByTagName("programa");
-			String track_title_new = nodes.item(0).getFirstChild().getNodeValue();
-
-			nodes = document.getElementsByTagName("episodio");
-			String track_description_new = null;
-			try {
-				track_description_new = nodes.item(0).getFirstChild().getNodeValue();
-			} catch (NullPointerException e) {
-				// TODO no episode name, do something?
-			}
-
-			nodes = document.getElementsByTagName("icono");
-			String new_artwork_url = nodes.item(0).getFirstChild().getNodeValue();
+			String track_description_new = jsonEmitiendo.getString("titulo");
 
 			if (track_title == null || track_title_new.compareTo(track_title) != 0 || (track_description == null && track_description_new != null) || (track_description_new != null && track_description_new.compareTo(track_description) != 0)) {
 				Log.d("RBT", "Different title and desc! " + track_title_new + "!=" + track_title + " OR " + track_description_new + "!=" + track_description);
 				track_title = track_title_new;
 				track_description = track_description_new;
-				if (artwork_url == null || new_artwork_url.compareTo(artwork_url) != 0) {
-					artwork_url = new_artwork_url;
-					downloadArtwork();
-				}
+				this.downloadArtwork();
 				return true;
 			} else {
 				Log.d("RBT", "Same title and desc!");
