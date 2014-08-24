@@ -38,7 +38,7 @@ public class DownloadCurrentInfoTimer {
 		doStop();
 		downloadinfoTimer = new Timer();
 		downloadinfoTimer.schedule(DownloadCurrentinfo.getTimerTask(this.context), 0, UPDATE_INTERVAL_MILLIS);
-		Log.d("RBT", "DownloadInfoTimer started");
+		Log.d("RBT", "DownloadInfoTimer: started");
 	}
 	
 	private void doStop() {
@@ -46,7 +46,7 @@ public class DownloadCurrentInfoTimer {
 		if (downloadinfoTimer != null) {
 			downloadinfoTimer.cancel();
 			downloadinfoTimer = null;
-			Log.d("RBT", "DownloadInfoTimer stopped");
+			Log.d("RBT", "DownloadInfoTimer: stopped");
 		}
 	}
 	

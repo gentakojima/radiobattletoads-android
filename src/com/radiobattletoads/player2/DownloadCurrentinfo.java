@@ -29,12 +29,14 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 	private static List<DownloadCurrentInfoListener> listeners = new ArrayList<DownloadCurrentInfoListener>();
 	public static void register(DownloadCurrentInfoListener listener) {
 		if (!listeners.contains(listener)) {
+			Log.d("RBT", "DownloadCurrentInfo: Registering listener");
 			listeners.add(listener);
 		}
 	}
 	
 	public static void unRegister(DownloadCurrentInfoListener listener) {
 		if (listeners.contains(listener)) {
+			Log.d("RBT", "DownloadCurrentInfo: Unregistering listener");
 			listeners.remove(listener);
 		}
 	}
@@ -59,7 +61,7 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 	}
 
 	private boolean downloadInfo() {
-		Log.d("RBT", "Downloading info");
+		Log.d("RBT", "DownloadCurrentInfo: Downloading info");
 
 		if (NetworkStatus.getStatus(this.context) == NetworkStatus.NETWORK_DISCONNECTED) {
 			return false;
@@ -91,12 +93,12 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 				this.downloadArtwork();
 				return true;
 			} else {
-				Log.d("RBT", "Same title and desc!");
+				Log.d("RBT", "DownloadCurrentInfo: Same title and desc!");
 				return false;
 			}
 
 		} catch (Exception e) {
-			Log.d("RBT", "Exception downloading :( " + e.getClass() + "---" + e.getMessage());
+			Log.d("RBT", "DownloadCurrentInfo: Exception downloading :( " + e.getClass() + "---" + e.getMessage());
 			// TODO handle this exception. DON'T RETUN TRUE!
 			return true;
 		}
@@ -104,7 +106,7 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 	}
 
 	private boolean downloadArtwork() {
-		Log.d("RBT", "Downloading artwork");
+		Log.d("RBT", "DownloadCurrentInfo: Downloading artwork");
 		if (artwork_url == null) {
 			return false;
 		}
@@ -185,6 +187,7 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 				if (DownloadCurrentinfo.isRunning) {
 					return;
 				}
+				Log.d("RBT","Downloadcurrentinfo gettimertask");
 				DownloadCurrentinfo task = new DownloadCurrentinfo(context);
 				task.execute();
 			}
