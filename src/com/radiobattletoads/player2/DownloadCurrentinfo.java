@@ -77,7 +77,7 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 			
 			String track_title_new;
 			try{
-				track_title_new = jsonEmitiendo.getString("nombre");
+				track_title_new = jsonEmitiendo.getString("programa");
 			}
 			catch(Exception e){
 				track_title_new = "Continuidad";
