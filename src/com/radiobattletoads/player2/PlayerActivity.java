@@ -16,17 +16,21 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.radiobattletoads.player2.DownloadCurrentinfo.DownloadCurrentInfoListener;
 import com.radiobattletoads.player2.PlayerService.PlayerStatusChangeListener;
 
-public class PlayerActivity extends ActionBarActivity implements DownloadCurrentInfoListener, PlayerStatusChangeListener {
+public class PlayerActivity extends ActionBarActivity implements DownloadCurrentInfoListener, PlayerStatusChangeListener,AnimationListener {
 
 	public final static int MESSAGE_PLAYERSTATUS = 1;
 	public final static int MESSAGE_CURRENTPROGRAM = 2;
@@ -37,7 +41,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 
 	public static final String BROADCAST_PAUSE = "broadcast_pause";
 
-	private LinearLayout trackinfo_layout_container;
+	private RelativeLayout trackinfo_layout_container;
 	private TextView tv_status;
 	private LinearLayout bufferingLayout;
 	private Button playButton;
@@ -65,7 +69,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		findViewById(R.id.trackInfoLayout).setLayoutParams(trackInfoParams);
 		
 		// View cache
-		trackinfo_layout_container = (LinearLayout) findViewById(R.id.trackInfoLayout);
+		trackinfo_layout_container = (RelativeLayout) findViewById(R.id.trackInfoLayout);
 		tv_status = (TextView) findViewById(R.id.playerStatus);
 		bufferingLayout = (LinearLayout) findViewById(R.id.bufferingLayout);
 		playButton = (Button) findViewById(R.id.playbutton);
@@ -190,6 +194,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		
 		final float scale = getResources().getDisplayMetrics().density;
 
+		LinearLayout old_trackinfo_layout = (LinearLayout) trackinfo_layout_container.getChildAt(0);
 		LinearLayout trackinfo_layout = new LinearLayout(PlayerActivity.this.getApplicationContext());
 		LinearLayout trackinfo_textlayout = new LinearLayout(PlayerActivity.this.getApplicationContext());
 		ImageView trackinfo_image = new ImageView(PlayerActivity.this.getApplicationContext());
@@ -246,6 +251,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		trackinfo_description.setText(newInfo.track_description);
 		trackinfo_image.setImageBitmap(newInfo.artwork_image);
 		
+		/* Interchange background with a smooth animation */
 		Drawable[] layers = new Drawable[2];
 		try{
 			layers[0] = new BitmapDrawable(getResources(), ((BitmapDrawable)background.getDrawable()).getBitmap());
@@ -258,9 +264,17 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		TransitionDrawable transitionDrawable = new TransitionDrawable(layers);
 		background.setImageDrawable(transitionDrawable);
 		transitionDrawable.startTransition(1000);
+		
+		TranslateAnimation translateAnimation1 = new TranslateAnimation(0f, getWindowManager().getDefaultDisplay().getWidth(), 0f, 0f);
+		translateAnimation1.setDuration(700);
+		translateAnimation1.setAnimationListener(this);
+		TranslateAnimation translateAnimation2 = new TranslateAnimation(-getWindowManager().getDefaultDisplay().getWidth(), 0f, 0f, 0f);
+		translateAnimation2.setDuration(700);
+		old_trackinfo_layout.startAnimation(translateAnimation1);
 
-		trackinfo_layout_container.removeViewAt(0);
 		trackinfo_layout_container.addView(trackinfo_layout);
+		trackinfo_layout.startAnimation(translateAnimation2);
+		
 	}
 
 	@Override
@@ -369,6 +383,22 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		 break;
 
 		}
+	}
+
+	@Override
+	public void onAnimationStart(Animation animation) {
+		
+	}
+
+	@Override
+	public void onAnimationEnd(Animation animation) {
+		trackinfo_layout_container.removeViewAt(0);
+
+	}
+
+	@Override
+	public void onAnimationRepeat(Animation animation) {
+
 	}
 	
 

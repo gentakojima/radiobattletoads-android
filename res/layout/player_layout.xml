@@ -18,7 +18,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/trackInfoLayout"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -28,8 +28,7 @@
         android:layout_marginTop="0dp"
         android:layout_weight="3"
         android:animateLayoutChanges="true"
-        android:background="#88000000"
-        android:orientation="horizontal" >
+        android:background="#88000000">
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -43,7 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
         </LinearLayout>
-    </LinearLayout>
+    </RelativeLayout>
 
     <TextView
         android:id="@+id/playerStatus"
