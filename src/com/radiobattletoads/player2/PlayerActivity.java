@@ -1,6 +1,12 @@
 package com.radiobattletoads.player2;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils.TruncateAt;
@@ -49,7 +55,13 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		status_trackinfo = STATUS_TRACKINFO_UNINITIALIZED;
 
 		// Initialize player looks and status
-		LayoutParams trackInfoParams = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, getWindowManager().getDefaultDisplay().getWidth() / 3 + 40);
+		LayoutParams trackInfoParams;
+		if( getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ){
+			trackInfoParams = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, getWindowManager().getDefaultDisplay().getHeight() / 3 + 40);
+		}
+		else{
+			trackInfoParams = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, getWindowManager().getDefaultDisplay().getWidth() / 3 + 40);
+		}
 		findViewById(R.id.trackInfoLayout).setLayoutParams(trackInfoParams);
 		
 		// View cache
@@ -127,7 +139,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.action_about:
+		case R.id.buttonslayout:
 			/*
 			 * Builder builder = new AlertDialog.Builder(this);
 			 * builder.setTitle(R.string.about_title);
@@ -167,6 +179,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onPlayingInformationChange(NowPlayingInfo newInfo) {
 		if (this.isFinishing()) {
@@ -182,16 +195,32 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		ImageView trackinfo_image = new ImageView(PlayerActivity.this.getApplicationContext());
 		TextView trackinfo_title = new TextView(PlayerActivity.this.getApplicationContext());
 		TextView trackinfo_description = new TextView(PlayerActivity.this.getApplicationContext());
+		ImageView background = (ImageView) findViewById(R.id.background);
+		TextView playerstatus = (TextView) findViewById(R.id.playerStatus);
+		LayoutParams playerstatus_params;
+		LayoutParams trackinfo_image_params;
+		LayoutParams trackinfo_params;
+		LayoutParams trackinfo_textlayout_params;
+		
+		if( getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE ){
+			playerstatus_params = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.FILL_PARENT, 4.0f);
+			trackinfo_image_params = new LayoutParams(getWindowManager().getDefaultDisplay().getHeight() / 3, LinearLayout.LayoutParams.MATCH_PARENT);
+			trackinfo_textlayout_params = new LayoutParams(2 * (getWindowManager().getDefaultDisplay().getHeight() / 3), LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
+		}
+		else{
+			playerstatus_params = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.FILL_PARENT, 2.0f);
+			trackinfo_image_params = new LayoutParams(getWindowManager().getDefaultDisplay().getWidth() / 3, LinearLayout.LayoutParams.MATCH_PARENT);
+			trackinfo_textlayout_params = new LayoutParams(2 * (getWindowManager().getDefaultDisplay().getWidth() / 3), LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
+		}
+		playerstatus.setLayoutParams(playerstatus_params);
 
 		trackinfo_layout.addView(trackinfo_image);
 		trackinfo_layout.addView(trackinfo_textlayout);
 
-		LayoutParams trackinfo_image_params = new LayoutParams(getWindowManager().getDefaultDisplay().getWidth() / 3, getWindowManager().getDefaultDisplay().getWidth() / 3, 1.0f);
 		trackinfo_image_params.setMargins(20, 20, 7, 20);
 		trackinfo_image.setLayoutParams(trackinfo_image_params);
 		trackinfo_image.setScaleType(ScaleType.FIT_CENTER);
 
-		LayoutParams trackinfo_textlayout_params = new LayoutParams(2 * (getWindowManager().getDefaultDisplay().getWidth() / 3), LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
 		trackinfo_textlayout_params.setMargins(7, 20, 20, 20);
 		trackinfo_textlayout.setLayoutParams(trackinfo_textlayout_params);
 
@@ -204,14 +233,31 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 
 		trackinfo_title.setTextSize((int) (12 * scale + 0.5f));
 		trackinfo_title.setGravity(Gravity.BOTTOM);
+		trackinfo_title.setShadowLayer((float) 4.0, 0, 0, Color.BLACK);
+		trackinfo_title.setTextColor(Color.WHITE);
 		trackinfo_description.setTextSize((int) (9 * scale + 0.5f));
 		trackinfo_description.setGravity(Gravity.TOP);
 		trackinfo_description.setMaxLines(2);
 		trackinfo_description.setEllipsize(TruncateAt.END);
+		trackinfo_description.setShadowLayer((float) 4.0, 0, 0, Color.BLACK);
+		trackinfo_description.setTextColor(Color.WHITE);
 
 		trackinfo_title.setText(newInfo.track_title);
 		trackinfo_description.setText(newInfo.track_description);
 		trackinfo_image.setImageBitmap(newInfo.artwork_image);
+		
+		Drawable[] layers = new Drawable[2];
+		try{
+			layers[0] = new BitmapDrawable(getResources(), ((BitmapDrawable)background.getDrawable()).getBitmap());
+		}
+		catch(java.lang.ClassCastException e){
+			layers[0] = new BitmapDrawable(getResources(), (((BitmapDrawable) (((TransitionDrawable)background.getDrawable()).getCurrent())).getBitmap()) );
+		}
+		layers[1] = new BitmapDrawable(getResources(), newInfo.background_image);
+
+		TransitionDrawable transitionDrawable = new TransitionDrawable(layers);
+		background.setImageDrawable(transitionDrawable);
+		transitionDrawable.startTransition(1000);
 
 		trackinfo_layout_container.removeViewAt(0);
 		trackinfo_layout_container.addView(trackinfo_layout);
@@ -298,5 +344,32 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		playButton.setVisibility(View.VISIBLE);
 		pauseButton.setVisibility(View.GONE);
 	}
+	
+	
+	public void onConfigurationChanged (Configuration newConfig){
+		
+		super.onConfigurationChanged(newConfig);
+		
+		int orientation=newConfig.orientation;
+		TextView playerstatus = (TextView) findViewById(R.id.playerStatus);
+		LayoutParams playerstatus_params;
+
+		switch(orientation) {
+
+		case Configuration.ORIENTATION_LANDSCAPE:
+			Log.d("RBT","Orientation changed to landscape");
+			playerstatus_params = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.FILL_PARENT, 4.0f);
+			playerstatus.setLayoutParams(playerstatus_params);
+		 break;
+
+		case Configuration.ORIENTATION_PORTRAIT:
+			Log.d("RBT","Orientation changed to portrait");
+			playerstatus_params = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.FILL_PARENT, 2.0f);
+			playerstatus.setLayoutParams(playerstatus_params);
+		 break;
+
+		}
+	}
+	
 
 }

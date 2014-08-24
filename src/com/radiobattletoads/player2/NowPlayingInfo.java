@@ -9,6 +9,7 @@ public class NowPlayingInfo {
 	public String track_description;
 	public String artwork_url;
 	public Bitmap artwork_image;
+	public Bitmap background_image;
 	
 	public String toString() {
 		if (track_title != null && track_description != null) {
@@ -29,4 +30,15 @@ public class NowPlayingInfo {
 					R.drawable.ic_launcher);
 		}
 	}
+	
+	public Bitmap getCurrentBackground(Context context) {
+		if (artwork_image != null) {
+			return background_image;
+		} else {
+			return BitmapFactory.decodeResource(
+					context.getResources(),
+					R.drawable.ic_launcher);
+		}
+	}
+
 }
