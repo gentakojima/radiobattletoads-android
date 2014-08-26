@@ -16,4 +16,10 @@
     <string name="preferences_notifications_desc">Will be shown when the radio is being played</string>
     <string name="preferences_buffering_warning_minimum">Buffering minimum value is 500ms. The minimum value has been set.</string>
     <string name="preferences_buffering_warning_maximum">Buffering maximum value is 20000ms. The maximum value has been set.</string>
+    <string name="aboutTitle">Radio Battletoads Alpha</string>
+    <string name="aboutText">Esta versión del reproductor utiliza libvlc para reproducir la radio. Funciona en dispositivos con procesadores ARM y x86, pero no con procesadores MIPS.</string>
+    <string name="aboutTitle2">¡Pero es una versión alpha!</string>
+    <string name="aboutText2">Eso significa que podrían fallar algunas cosas y que no está completa. Por el momento únicamente se puede escuchar la radio. Si el reproductor no funciona, haznos llegar tus comentarios al correo holabuenas@radiobattletoads.com</string>
+    <string name="aboutTitle3">Licencia</string>
+    <string name="aboutText3">Esta aplicación ha sido desarrollada por Jorge Suárez de Lis (yo@jorgesuarezdelis.name). El código fuente está disponible en Github con licencia GNU GPL versión 3.</string>
 </resources>

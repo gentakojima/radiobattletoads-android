@@ -156,6 +156,10 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 			Intent intent = new Intent(PlayerActivity.this, PreferencesActivity.class);
 			PlayerActivity.this.startActivity(intent);
 			return true;
+		case R.id.action_about:
+			Intent intent2 = new Intent(PlayerActivity.this, AboutActivity.class);
+			PlayerActivity.this.startActivity(intent2);
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -257,7 +261,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 			layers[0] = new BitmapDrawable(getResources(), ((BitmapDrawable)background.getDrawable()).getBitmap());
 		}
 		catch(java.lang.ClassCastException e){
-			layers[0] = new BitmapDrawable(getResources(), ( (BitmapDrawable) ( (TransitionDrawable)background.getDrawable() ).getDrawable(1)).getBitmap());
+			layers[0] = new BitmapDrawable(getResources(), ((BitmapDrawable)((TransitionDrawable)background.getDrawable()).getDrawable(1)).getBitmap());
 		}
 		layers[1] = new BitmapDrawable(getResources(), newInfo.background_image);
 
