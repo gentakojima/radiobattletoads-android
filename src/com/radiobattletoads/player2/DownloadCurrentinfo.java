@@ -19,6 +19,10 @@ import com.squareup.okhttp.apache.OkApacheClient;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
@@ -131,6 +135,7 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 				}
 				else{
 					background_image = this.fastblur(Bitmap.createScaledBitmap(artwork_image, 600, 600, true),35);
+					background_image = this.changeBitmapContrastBrightness(background_image, 0.6f,-40f);
 				}
 			}
 		} catch (IOException e) {
@@ -430,6 +435,34 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 
         return (bitmap);
     }
+	
+	/**
+	 * 
+	 * @param bmp input bitmap
+	 * @param contrast 0..10 1 is default
+	 * @param brightness -255..255 0 is default
+	 * @return new bitmap
+	 */
+	private Bitmap changeBitmapContrastBrightness(Bitmap bmp, float contrast, float brightness)
+	{
+	    ColorMatrix cm = new ColorMatrix(new float[]
+	            {
+	                contrast, 0, 0, 0, brightness,
+	                0, contrast, 0, 0, brightness,
+	                0, 0, contrast, 0, brightness,
+	                0, 0, 0, 1, 0
+	            });
+
+	    Bitmap ret = Bitmap.createBitmap(bmp.getWidth(), bmp.getHeight(), bmp.getConfig());
+
+	    Canvas canvas = new Canvas(ret);
+
+	    Paint paint = new Paint();
+	    paint.setColorFilter(new ColorMatrixColorFilter(cm));
+	    canvas.drawBitmap(bmp, 0, 0, paint);
+
+	    return ret;
+	}
 	
 
 }
