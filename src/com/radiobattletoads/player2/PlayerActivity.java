@@ -1,5 +1,6 @@
 package com.radiobattletoads.player2;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -25,6 +26,7 @@ import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.radiobattletoads.player2.DownloadCurrentinfo.DownloadCurrentInfoListener;
@@ -42,7 +44,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 	public static final String BROADCAST_PAUSE = "broadcast_pause";
 
 	private RelativeLayout trackinfo_layout_container;
-	private TextView tv_status;
+	private LinearLayout moreinfo_layout;
 	private LinearLayout bufferingLayout;
 	private Button playButton;
 	private Button pauseButton;
@@ -70,7 +72,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		
 		// View cache
 		trackinfo_layout_container = (RelativeLayout) findViewById(R.id.trackInfoLayout);
-		tv_status = (TextView) findViewById(R.id.playerStatus);
+		//tv_status = (TextView) findViewById(R.id.playerStatus);
 		bufferingLayout = (LinearLayout) findViewById(R.id.bufferingLayout);
 		playButton = (Button) findViewById(R.id.playbutton);
 		pauseButton = (Button) findViewById(R.id.pauseButton);
@@ -143,7 +145,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
 		switch (item.getItemId()) {
-		case R.id.buttonslayout:
+		case R.id.buttonsLayout:
 			/*
 			 * Builder builder = new AlertDialog.Builder(this);
 			 * builder.setTitle(R.string.about_title);
@@ -203,9 +205,13 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		LinearLayout trackinfo_textlayout = new LinearLayout(PlayerActivity.this.getApplicationContext());
 		ImageView trackinfo_image = new ImageView(PlayerActivity.this.getApplicationContext());
 		TextView trackinfo_title = new TextView(PlayerActivity.this.getApplicationContext());
-		TextView trackinfo_description = new TextView(PlayerActivity.this.getApplicationContext());
+		TextView trackinfo_chapter = new TextView(PlayerActivity.this.getApplicationContext());
+		TextView trackinfo_tipotiempo = new TextView(PlayerActivity.this.getApplicationContext());
+		TextView trackinfo_twitter = new TextView(PlayerActivity.this.getApplicationContext());
+		TextView trackinfo_web = new TextView(PlayerActivity.this.getApplicationContext());
+		TextView trackinfo_desc = new TextView(PlayerActivity.this.getApplicationContext());
 		ImageView background = (ImageView) findViewById(R.id.background);
-		TextView playerstatus = (TextView) findViewById(R.id.playerStatus);
+		//TextView playerstatus = (TextView) findViewById(R.id.playerStatus);
 		LayoutParams playerstatus_params;
 		LayoutParams trackinfo_image_params;
 		LayoutParams trackinfo_params;
@@ -221,7 +227,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 			trackinfo_image_params = new LayoutParams(getWindowManager().getDefaultDisplay().getWidth() / 3, LinearLayout.LayoutParams.MATCH_PARENT);
 			trackinfo_textlayout_params = new LayoutParams(2 * (getWindowManager().getDefaultDisplay().getWidth() / 3), LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
 		}
-		playerstatus.setLayoutParams(playerstatus_params);
+		//playerstatus.setLayoutParams(playerstatus_params);
 
 		trackinfo_layout.addView(trackinfo_image);
 		trackinfo_layout.addView(trackinfo_textlayout);
@@ -237,22 +243,47 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		LayoutParams trackinfo_titledesc_params = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f);
 		trackinfo_title.setLayoutParams(trackinfo_titledesc_params);
 		trackinfo_textlayout.addView(trackinfo_title);
-		trackinfo_description.setLayoutParams(trackinfo_titledesc_params);
-		trackinfo_textlayout.addView(trackinfo_description);
+		trackinfo_chapter.setLayoutParams(trackinfo_titledesc_params);
+		trackinfo_textlayout.addView(trackinfo_chapter);
+		trackinfo_chapter.setLayoutParams(trackinfo_titledesc_params);
+		trackinfo_textlayout.addView(trackinfo_tipotiempo);
 
-		trackinfo_title.setTextSize((int) (12 * scale + 0.5f));
-		trackinfo_title.setGravity(Gravity.BOTTOM);
+		trackinfo_title.setTextSize((int) (11 * scale + 0.5f));
+		trackinfo_title.setGravity(Gravity.CENTER_VERTICAL);
 		trackinfo_title.setShadowLayer((float) 4.0, 0, 0, Color.BLACK);
 		trackinfo_title.setTextColor(Color.WHITE);
-		trackinfo_description.setTextSize((int) (9 * scale + 0.5f));
-		trackinfo_description.setGravity(Gravity.TOP);
-		trackinfo_description.setMaxLines(2);
-		trackinfo_description.setEllipsize(TruncateAt.END);
-		trackinfo_description.setShadowLayer((float) 4.0, 0, 0, Color.BLACK);
-		trackinfo_description.setTextColor(Color.WHITE);
-
+		trackinfo_title.setMaxLines(1);
+		trackinfo_title.setEllipsize(TruncateAt.END);
+		trackinfo_title.setLayoutParams(new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.2f));
+		trackinfo_chapter.setTextSize((int) (9 * scale + 0.5f));
+		trackinfo_chapter.setGravity(Gravity.CENTER_VERTICAL);
+		trackinfo_chapter.setMaxLines(2);
+		trackinfo_chapter.setEllipsize(TruncateAt.END);
+		trackinfo_chapter.setShadowLayer((float) 4.0, 0, 0, Color.BLACK);
+		trackinfo_chapter.setTextColor(Color.WHITE);
+		trackinfo_chapter.setLayoutParams(new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+		trackinfo_tipotiempo.setTextSize((int) (9 * scale + 0.5f));
+		trackinfo_tipotiempo.setGravity(Gravity.CENTER_VERTICAL);
+		trackinfo_tipotiempo.setMaxLines(2);
+		trackinfo_tipotiempo.setEllipsize(TruncateAt.END);
+		trackinfo_tipotiempo.setShadowLayer((float) 4.0, 0, 0, Color.BLACK);
+		trackinfo_tipotiempo.setTextColor(Color.WHITE);
+		trackinfo_tipotiempo.setLayoutParams(new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
+		
 		trackinfo_title.setText(newInfo.track_title);
-		trackinfo_description.setText(newInfo.track_description);
+		trackinfo_chapter.setText(newInfo.track_chapter);
+		String tipotiempo;
+		if(newInfo.track_tipo=="continuidad"){
+			tipotiempo="Continuidad. Próximo programa en " + this.timeToString(newInfo.track_empiezaen);
+		}
+		else{
+			if(newInfo.track_tipo=="directo") tipotiempo="Directo. ";
+			else if(newInfo.track_tipo=="estreno") tipotiempo="Estreno. ";
+			else if(newInfo.track_tipo=="reposicion") tipotiempo="Reposición. ";
+			else tipotiempo="Reposición automática. ";
+			tipotiempo += "Empezó hace " + this.timeToString(newInfo.track_empezadohace);
+		}
+		trackinfo_tipotiempo.setText(tipotiempo);
 		trackinfo_image.setImageBitmap(newInfo.artwork_image);
 		
 		/* Interchange background with a smooth animation */
@@ -278,6 +309,46 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 
 		trackinfo_layout_container.addView(trackinfo_layout);
 		trackinfo_layout.startAnimation(translateAnimation2);
+		
+		/* Info extra */
+		this.moreinfo_layout = (LinearLayout) findViewById(R.id.moreinfo_layout);
+		moreinfo_layout.removeAllViews();
+		
+		if(newInfo.track_desc!=null){
+			trackinfo_desc.setText(newInfo.track_desc);
+			trackinfo_desc.setShadowLayer((float) 4.0, 0, 0, Color.BLACK);
+			trackinfo_desc.setTextColor(Color.WHITE);
+			LayoutParams trackinfo_desc_params = new LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			trackinfo_desc_params.setMargins(20, 20, 20, 10);
+			trackinfo_desc.setLayoutParams(trackinfo_desc_params);
+			moreinfo_layout.addView(trackinfo_desc);
+		}
+		if(newInfo.track_web!=null){
+			trackinfo_web.setText(newInfo.track_web.replaceAll("^https?://(www\\.)?", "").replaceAll("/$",""));
+			trackinfo_web.setShadowLayer((float) 4.0, 0, 0, Color.BLACK);
+			trackinfo_web.setTextColor(Color.WHITE);
+			LayoutParams trackinfo_web_params = new LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			trackinfo_web_params.setMargins(20, 10, 20, 10);
+			trackinfo_web.setLayoutParams(trackinfo_web_params);
+			Drawable icon_link = getResources().getDrawable(R.drawable.icon_link);
+			icon_link.setBounds(0, 0, 14, 14);
+			trackinfo_web.setCompoundDrawablesRelative(icon_link, null, null, null);
+			trackinfo_web.setCompoundDrawablePadding(10);
+			moreinfo_layout.addView(trackinfo_web);
+		}
+		if(newInfo.track_twitter!=null){
+			trackinfo_twitter.setText(newInfo.track_twitter);
+			trackinfo_twitter.setShadowLayer((float) 4.0, 0, 0, Color.BLACK);
+			trackinfo_twitter.setTextColor(Color.WHITE);
+			LayoutParams trackinfo_twitter_params = new LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+			trackinfo_twitter_params.setMargins(20, 10, 20, 10);
+			trackinfo_twitter.setLayoutParams(trackinfo_twitter_params);
+			Drawable icon_twitter = getResources().getDrawable(R.drawable.icon_twitter);
+			icon_twitter.setBounds(0, 0, 14, 12);
+			trackinfo_twitter.setCompoundDrawablesRelative(icon_twitter, null, null, null);
+			trackinfo_twitter.setCompoundDrawablePadding(10);
+			moreinfo_layout.addView(trackinfo_twitter);
+		}
 		
 	}
 
@@ -309,7 +380,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 
 	@Override
 	public void onPlayerUninitialized() {
-		tv_status.setText("Uninitialized");
+		//tv_status.setText("Uninitialized");
 		bufferingLayout.setVisibility(View.GONE);
 		playButton.setVisibility(View.VISIBLE);
 		pauseButton.setVisibility(View.GONE);
@@ -317,7 +388,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 
 	@Override
 	public void onPlayerReady() {
-		tv_status.setText("Ready (idle)");
+		//tv_status.setText("Ready (idle)");
 		bufferingLayout.setVisibility(View.VISIBLE);
 		playButton.setVisibility(View.GONE);
 		pauseButton.setVisibility(View.GONE);
@@ -325,7 +396,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 
 	@Override
 	public void onPlayerPlaying() {
-		tv_status.setText("Playing");
+		//tv_status.setText("Playing");
 		bufferingLayout.setVisibility(View.GONE);
 		playButton.setVisibility(View.GONE);
 		pauseButton.setVisibility(View.VISIBLE);
@@ -333,7 +404,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 
 	@Override
 	public void onPlayerBuffering() {
-		tv_status.setText("Buffering...");
+		//tv_status.setText("Buffering...");
 		bufferingLayout.setVisibility(View.VISIBLE);
 		playButton.setVisibility(View.GONE);
 		pauseButton.setVisibility(View.GONE);
@@ -341,7 +412,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 
 	@Override
 	public void onPlayerInitializing() {
-		tv_status.setText("Initializing...");
+		//tv_status.setText("Initializing...");
 		bufferingLayout.setVisibility(View.VISIBLE);
 		playButton.setVisibility(View.GONE);
 		pauseButton.setVisibility(View.GONE);
@@ -349,7 +420,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 
 	@Override
 	public void onPlayerConnectionError() {
-		tv_status.setText("Check your connection!");
+		//tv_status.setText("Check your connection!");
 		bufferingLayout.setVisibility(View.GONE);
 		playButton.setVisibility(View.VISIBLE);
 		pauseButton.setVisibility(View.GONE);
@@ -357,7 +428,7 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 
 	@Override
 	public void onPlayerConnectionCut() {
-		tv_status.setText("The stream ended!");
+		//tv_status.setText("The stream ended!");
 		bufferingLayout.setVisibility(View.GONE);
 		playButton.setVisibility(View.VISIBLE);
 		pauseButton.setVisibility(View.GONE);
@@ -369,21 +440,63 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		super.onConfigurationChanged(newConfig);
 		
 		int orientation=newConfig.orientation;
-		TextView playerstatus = (TextView) findViewById(R.id.playerStatus);
-		LayoutParams playerstatus_params;
+		RelativeLayout trackInfoLayout = (RelativeLayout) findViewById(R.id.trackInfoLayout);
+		ScrollView scrollInfoLayout = (ScrollView) findViewById(R.id.scrollInfoLayout);
+		RelativeLayout buttonsLayout = (RelativeLayout) findViewById(R.id.buttonsLayout);
+		RelativeLayout rootLayout = (RelativeLayout) findViewById(R.id.rootlayout);
 
 		switch(orientation) {
 
 		case Configuration.ORIENTATION_LANDSCAPE:
 			Log.d("RBT","Orientation changed to landscape");
-			playerstatus_params = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.FILL_PARENT, 4.0f);
-			playerstatus.setLayoutParams(playerstatus_params);
+			LinearLayout horizontalLayout = new LinearLayout(PlayerActivity.this.getApplicationContext());
+			LinearLayout innerVerticalLayout = new LinearLayout(PlayerActivity.this.getApplicationContext());
+			horizontalLayout.setOrientation(LinearLayout.HORIZONTAL);
+			innerVerticalLayout.setOrientation(LinearLayout.VERTICAL);
+			LinearLayout verticalLayout = (LinearLayout) findViewById(R.id.verticalLayout);
+			verticalLayout.removeAllViews();
+			horizontalLayout.setId(R.id.horizontalLayout);
+			innerVerticalLayout.setId(R.id.innerVerticalLayout);
+			innerVerticalLayout.addView(trackInfoLayout,0);
+			innerVerticalLayout.addView(buttonsLayout,1);
+			horizontalLayout.addView(innerVerticalLayout,0);
+			horizontalLayout.addView(scrollInfoLayout,1);
+			innerVerticalLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT, 1.0f));
+			scrollInfoLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT, 1.6f));
+			rootLayout.removeViewAt(1);
+			rootLayout.addView(horizontalLayout,1);
 		 break;
 
 		case Configuration.ORIENTATION_PORTRAIT:
 			Log.d("RBT","Orientation changed to portrait");
-			playerstatus_params = new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.FILL_PARENT, 2.0f);
-			playerstatus.setLayoutParams(playerstatus_params);
+			LinearLayout verticalLayout1 = new LinearLayout(PlayerActivity.this.getApplicationContext());
+			verticalLayout1.setOrientation(LinearLayout.VERTICAL);
+			verticalLayout1.setLayoutParams(new LinearLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT));
+			LinearLayout horizontalLayout1 = (LinearLayout) findViewById(R.id.horizontalLayout);
+			LinearLayout innerVerticalLayout1 = (LinearLayout) findViewById(R.id.innerVerticalLayout);
+			innerVerticalLayout1.removeAllViews();
+			horizontalLayout1.removeAllViews();
+			verticalLayout1.setId(R.id.verticalLayout);
+			verticalLayout1.addView(trackInfoLayout,0);
+			verticalLayout1.addView(scrollInfoLayout,1);
+			verticalLayout1.addView(buttonsLayout,2);
+			trackInfoLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT, 3.0f));
+			scrollInfoLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT, 2.0f));
+			buttonsLayout.setLayoutParams(new LinearLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT, 3.0f));
+			rootLayout.removeViewAt(1);
+			rootLayout.addView(verticalLayout1,1);
 		 break;
 
 		}
@@ -403,6 +516,15 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 	@Override
 	public void onAnimationRepeat(Animation animation) {
 
+	}
+	
+	@SuppressLint("DefaultLocale")
+	private String timeToString(Integer t){
+		if(t==null) return "";
+		Integer t_mins = (int) Math.floor((t%3600)/60);
+		Integer t_hours = (int) Math.floor(t/3600);
+		return String.format("%02d:%02d", t_hours, t_mins);
+		
 	}
 	
 

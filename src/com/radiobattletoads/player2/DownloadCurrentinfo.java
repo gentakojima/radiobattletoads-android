@@ -52,10 +52,16 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 	public final static int DOWNLOADCURRENTINFO_FAILED = 5;
 
 	private static String track_title;
-	private static String track_description;
+	private static String track_chapter;
 	private static String artwork_url = "http://radiobattletoads.com/data/iconogrande-get.php";
 	private static Bitmap artwork_image;
 	private static Bitmap background_image;
+	private static String track_twitter;
+	private static String track_web;
+	private static String track_desc;
+	private static Integer track_empezadohace;
+	private static Integer track_empiezaen;
+	private static String track_tipo;
 	
 	protected static final HttpClient sHttpClient = new OkApacheClient();
 
@@ -91,10 +97,40 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 			}
 			String track_description_new = jsonEmitiendo.getString("titulo");
 
-			if (track_title == null || track_title_new.compareTo(track_title) != 0 || (track_description == null && track_description_new != null) || (track_description_new != null && track_description_new.compareTo(track_description) != 0)) {
-				Log.d("RBT", "Different title and desc! " + track_title_new + "!=" + track_title + " OR " + track_description_new + "!=" + track_description);
+			if (track_title == null || track_title_new.compareTo(track_title) != 0 || (track_chapter == null && track_description_new != null) || (track_description_new != null && track_description_new.compareTo(track_chapter) != 0)) {
+				Log.d("RBT", "Different title and desc! " + track_title_new + "!=" + track_title + " OR " + track_description_new + "!=" + track_chapter);
 				track_title = track_title_new;
-				track_description = track_description_new;
+				track_chapter = track_description_new;
+				try{
+					track_desc = jsonEmitiendo.getString("descripcion");
+				}
+				catch(Exception e){
+					track_desc = null;
+				}
+				try{
+					track_twitter = jsonEmitiendo.getString("twitter");
+				}catch(Exception e){
+					track_twitter = null;
+				}
+				try{
+					track_web = jsonEmitiendo.getString("web");
+				}
+				catch(Exception e){
+					track_web = null;
+				}
+				track_tipo = jsonEmitiendo.getString("tipo");
+				try{
+					track_empezadohace = jsonEmitiendo.getInt("empezadohace");
+				}
+				catch(Exception e){
+					track_empezadohace = null;
+				}
+				try{
+					track_empiezaen = jsonEmitiendo.getInt("empiezaen");
+				}
+				catch(Exception e){
+					track_empiezaen = null;
+				}
 				this.downloadArtwork();
 				return true;
 			} else {
@@ -162,10 +198,16 @@ public class DownloadCurrentinfo extends AsyncTask<String, Integer, Boolean> {
 			if (result) {
 				NowPlayingInfo info = new NowPlayingInfo();
 				info.track_title = track_title;
-				info.track_description = track_description;
+				info.track_chapter = track_chapter;
 				info.artwork_url = artwork_url;
 				info.artwork_image = artwork_image;
 				info.background_image = background_image;
+				info.track_twitter = track_twitter;
+				info.track_desc = track_desc;
+				info.track_web = track_web;
+				info.track_empiezaen = track_empiezaen;
+				info.track_empezadohace = track_empezadohace;
+				info.track_tipo = track_tipo;
 				RBTPlayerApplication.getFromContext(context).setCachedNowPlayingInfo(info);
 				RBTPlayerApplication.getFromContext(context).getNotifications().updateNotification();
 				for (int i=0;i<DownloadCurrentinfo.listeners.size();i++) {

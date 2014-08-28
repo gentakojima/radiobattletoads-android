@@ -13,22 +13,23 @@
         android:scaleType="centerCrop"
         android:src="@drawable/background" />
     
-    <LinearLayout 
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    <LinearLayout
+        android:id="@+id/verticalLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
 
     <RelativeLayout
         android:id="@+id/trackInfoLayout"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginBottom="0dp"
         android:layout_marginLeft="0dp"
         android:layout_marginRight="0dp"
         android:layout_marginTop="0dp"
         android:layout_weight="3"
         android:animateLayoutChanges="true"
-        android:background="#88000000">
+        android:background="#99000000" >
 
         <LinearLayout
             android:layout_width="fill_parent"
@@ -44,21 +45,27 @@
         </LinearLayout>
     </RelativeLayout>
 
-    <TextView
-        android:id="@+id/playerStatus"
+    <ScrollView
+        android:id="@+id/scrollInfoLayout"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
-        android:layout_weight="2"
-        android:gravity="center"
-        android:text="Uninitialized"
-        android:visibility="invisible" />
+        android:layout_height="match_parent"
+        android:layout_weight="2" >
+
+        <LinearLayout
+            android:id="@+id/moreinfo_layout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical" >
+
+        </LinearLayout>
+    </ScrollView>
 
     <RelativeLayout
-        android:id="@+id/buttonslayout"
+        android:id="@+id/buttonsLayout"
         android:layout_width="match_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="match_parent"
         android:layout_weight="3"
-        android:background="#55000000" >
+        android:background="#99000000" >
 
         <Button
             android:id="@+id/pauseButton"
