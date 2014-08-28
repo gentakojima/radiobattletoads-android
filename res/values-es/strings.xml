@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Radio Battletoads Player Alpha</string>
+    <string name="app_version">1</string>
+    <string name="action_settings">Preferencias</string>
+    <string name="action_about">Acerca de</string>
+    <string name="play">Reproducir</string>
+    <string name="pause">Pausar</string>
+    <string name="buffering">Cargando&#8230;</string>
+    <string name="cantdownloadinfo">No se puede descargar la información de la pista. Comprueba tu conexión.</string>
+    <string name="preferences_title">Preferencias</string>
+    <string name="preferences_network">Conexión</string>
+    <string name="preferences_behaviour">Comportamiento</string>
+    <string name="preferences_notifications">Habilitar notificaciones</string>
+    <string name="preferences_notifications_desc">Se mostrarán cuando la radio se esté reproduciendo</string>
+    <string name="preferences_buffering_warning_minimum">El valor mínimo del buffer es 500ms. Se ha establecido el valor mínimo.</string>
+    <string name="preferences_buffering_warning_maximum">El valor máximo del buffer es 20000ms. Se ha establecido el valor máximo.</string>
+    <string name="aboutTitle">Radio Battletoads Alpha</string>
+    <string name="aboutText">Esta versión del reproductor utiliza libvlc para reproducir la radio. Funciona en dispositivos con procesadores ARM y x86, pero no con procesadores MIPS.</string>
+    <string name="aboutTitle2">¡Pero es una versión alpha!</string>
+    <string name="aboutText2">Eso significa que podrían fallar algunas cosas y que no está completa. Por el momento únicamente se puede escuchar la radio. Si el reproductor no funciona, haznos llegar tus comentarios al correo holabuenas@radiobattletoads.com</string>
+    <string name="aboutTitle3">Licencia</string>
+    <string name="aboutText3">Esta aplicación ha sido desarrollada por Jorge Suárez de Lis (yo@jorgesuarezdelis.name). El código fuente está disponible en Github con licencia GNU GPL versión 3.</string>
+</resources>
