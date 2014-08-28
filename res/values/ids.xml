@@ -3,4 +3,5 @@
     <item name="verticalLayout" type="id"/>
     <item name="horizontalLayout" type="id"/>
     <item name="innerVerticalLayout" type="id"/>
+    <item name="infotextTypedate" type="id" />
 </resources>

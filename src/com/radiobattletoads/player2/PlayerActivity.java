@@ -1,5 +1,8 @@
 package com.radiobattletoads.player2;
 
+
+import java.util.Date;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
@@ -9,6 +12,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils.TruncateAt;
 import android.util.Log;
@@ -49,6 +54,8 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 	private Button playButton;
 	private Button pauseButton;
 	private NowPlayingInfo currentDisplayedInfo = null;
+	
+	private Date currentDisplayedInfoTime = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -101,6 +108,39 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 			this.onPlayerReady();
 			break;
 		}
+		
+		// Create timer to update time
+		Thread t = new Thread() {
+
+		  @Override
+		  public void run() {
+		    try {
+		      while (!isInterrupted()) {
+		        Thread.sleep(19000);
+		        runOnUiThread(new Runnable() {
+		          @Override
+		          public void run() {
+		            TextView tv = (TextView) findViewById(R.id.infotextTypedate);
+		            if(tv!=null){
+		            	Date ahora = new Date();
+		            	Integer tiempopasado = (int) ((ahora.getTime() - PlayerActivity.this.currentDisplayedInfoTime.getTime())/1000);
+		            	String newDate = null;
+		            	if(PlayerActivity.this.currentDisplayedInfo.track_tipo.compareTo("continuidad")==0){
+		            		newDate = PlayerActivity.this.timeToString(PlayerActivity.this.currentDisplayedInfo.track_empiezaen - tiempopasado);
+		            	}
+		            	else{
+		            		newDate = PlayerActivity.this.timeToString(PlayerActivity.this.currentDisplayedInfo.track_empezadohace + tiempopasado);
+		            	}
+		            	tv.setText(tv.getText().toString().replaceAll("[0-9]+:[0-9]+$", newDate));
+		            }
+		          }
+		        });
+		      }
+		    } catch (InterruptedException e) {
+		    }
+		  }
+		};
+		t.start();
 	}
 	
 	@Override
@@ -270,16 +310,21 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		trackinfo_tipotiempo.setTextColor(Color.WHITE);
 		trackinfo_tipotiempo.setLayoutParams(new LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.MATCH_PARENT, 1.0f));
 		
+		// Set ID to update time
+		trackinfo_tipotiempo.setId(R.id.infotextTypedate);
+		currentDisplayedInfoTime = new Date();
+		
 		trackinfo_title.setText(newInfo.track_title);
 		trackinfo_chapter.setText(newInfo.track_chapter);
 		String tipotiempo;
-		if(newInfo.track_tipo=="continuidad"){
+		Log.d("RBT",newInfo.track_tipo);
+		if(newInfo.track_tipo.compareTo("continuidad")==0){
 			tipotiempo="Continuidad. Próximo programa en " + this.timeToString(newInfo.track_empiezaen);
 		}
 		else{
-			if(newInfo.track_tipo=="directo") tipotiempo="Directo. ";
-			else if(newInfo.track_tipo=="estreno") tipotiempo="Estreno. ";
-			else if(newInfo.track_tipo=="reposicion") tipotiempo="Reposición. ";
+			if(newInfo.track_tipo.compareTo("directo")==0) tipotiempo="Directo. ";
+			else if(newInfo.track_tipo.compareTo("estreno")==0) tipotiempo="Estreno. ";
+			else if(newInfo.track_tipo.compareTo("reposicion")==0) tipotiempo="Reposición. ";
 			else tipotiempo="Reposición automática. ";
 			tipotiempo += "Empezó hace " + this.timeToString(newInfo.track_empezadohace);
 		}
