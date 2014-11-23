@@ -10,16 +10,15 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
-import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationCompat.Builder;
 
 public class Notifications implements DownloadCurrentInfoListener, PlayerStatusChangeListener {
 
 	private NotificationManager notificationManager = null;
+	private Notification builtNotification = null;
 	private Builder notifBuilder = null;
 	private Context context;
-	private boolean enabled = true;
 	private boolean showNowPlayingNotification = false;
 
 	public Notifications(Context context) {
@@ -27,7 +26,10 @@ public class Notifications implements DownloadCurrentInfoListener, PlayerStatusC
 
 		notificationManager = (NotificationManager) this.context.getSystemService(Context.NOTIFICATION_SERVICE);
 		
-		enabled = PreferenceManager.getDefaultSharedPreferences(this.context).getBoolean("notification", true);
+	}
+	
+	public Notification getBuiltNotification(){
+		return this.builtNotification;
 	}
 	
 	public void onCreate() {
@@ -50,7 +52,6 @@ public class Notifications implements DownloadCurrentInfoListener, PlayerStatusC
 	public boolean addNotification() {
 		
 		// Check preference
-		if(!enabled) return false;
 		showNowPlayingNotification = true;
 
 		// Build the intents
@@ -80,20 +81,17 @@ public class Notifications implements DownloadCurrentInfoListener, PlayerStatusC
 					.setContentIntent(contentIntent)
 					.addAction(android.R.drawable.ic_media_pause, "Pause", pauseIntent);
 		}
-		Notification notifBuilt = notifBuilder.build();
-		notifBuilt.flags = Notification.FLAG_NO_CLEAR;
+		builtNotification = notifBuilder.build();
+		builtNotification.flags = Notification.FLAG_NO_CLEAR;
 
 		// Show the notification
-		notificationManager.notify(0, notifBuilt);
+		// notificationManager.notify(0, builtNotification);
+		PlayerService.setToForeground(builtNotification);
 
 		return true;
 	}
 
 	public boolean updateNotification() {
-
-		if (!enabled || !showNowPlayingNotification) {
-			return false;
-		}
 		
 		NowPlayingInfo npi = RBTPlayerApplication.getFromContext(context).getCachedNowPlayingInfo();
 		if (npi == null) {
@@ -111,7 +109,8 @@ public class Notifications implements DownloadCurrentInfoListener, PlayerStatusC
 			Notification notifBuilt = notifBuilder.build();
 			notifBuilt.flags = Notification.FLAG_NO_CLEAR;
 			// Show the notification
-			notificationManager.notify(0, notifBuilt);
+			// notificationManager.notify(0, notifBuilt);
+			// NOPE. It will be shown later by the service itself
 			return true;
 		} else {
 			return false;
@@ -122,19 +121,6 @@ public class Notifications implements DownloadCurrentInfoListener, PlayerStatusC
 		showNowPlayingNotification = false;
 		DownloadCurrentinfo.unRegister(this);
 		notificationManager.cancelAll();
-		return true;
-	}
-	
-	
-	public boolean disable(){
-		this.enabled = false;
-		this.removeNotification();
-		return true;
-	}
-	
-	public boolean enable(){
-		this.enabled = true;
-		this.updateNotification();
 		return true;
 	}
 
@@ -170,7 +156,6 @@ public class Notifications implements DownloadCurrentInfoListener, PlayerStatusC
 
 	@Override
 	public void onPlayerInitializing() {
-		
 	}
 
 	@Override

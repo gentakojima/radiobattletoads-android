@@ -235,6 +235,10 @@ public class PlayerActivity extends ActionBarActivity implements DownloadCurrent
 		if (this.isFinishing()) {
 			return;
 		}
+		if(newInfo.track_title==null){
+			Log.d("RBT","Received null value? Do not want. Won't show that.");
+			return;
+		}
 		this.currentDisplayedInfo = newInfo;
 		Log.d("RBT", "Received downloaded info");
 		

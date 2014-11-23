@@ -7,6 +7,7 @@ import org.videolan.libvlc.LibVLC;
 import org.videolan.libvlc.LibVlcException;
 import org.videolan.libvlc.MediaList;
 
+import android.app.Notification;
 import android.app.Service;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +18,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 public class PlayerService extends Service implements Runnable {
+	
+	private static int FOREGROUND_ID=1337;
 
 	// Static listeners
 	private static ArrayList<PlayerStatusChangeListener> listeners = new ArrayList<PlayerStatusChangeListener>();
@@ -60,6 +63,8 @@ public class PlayerService extends Service implements Runnable {
 	private PlayerServiceHandler myHandler = new PlayerServiceHandler(this);
 
 	protected void play() {
+		Log.d("RBT", "Called service play!");
+		if(mLibVLC==null) this.prepare();
 		// Play radio (assuming prepare was called before)
 		mLibVLC.playIndex(0);
 		// mLibVLC.play();
@@ -68,6 +73,8 @@ public class PlayerService extends Service implements Runnable {
 	}
 
 	protected void stop() {
+		Log.d("RBT", "Called service stop!");
+		if(mLibVLC==null) return;
 		// Stop radio (assuming prepare was called before)
 		mLibVLC.stop();
 		// Set current status
@@ -77,6 +84,8 @@ public class PlayerService extends Service implements Runnable {
 	}
 
 	protected void destroy() {
+		Log.d("RBT", "Called service destroy!");
+		if(mLibVLC==null) return;
 		// Completely stop and destroy the multimedia framework
 		mLibVLC.stop();
 		mLibVLC.destroy();
@@ -242,6 +251,7 @@ public class PlayerService extends Service implements Runnable {
 			Log.d("RBT", "Service started!");
 			return START_STICKY;
 		} else if (playerThread != null && ACTION_STOP.equals(intent.getAction())) {
+			stopForeground(false);
 			this.stopSelf();
 		}
 		return START_NOT_STICKY;
@@ -249,6 +259,7 @@ public class PlayerService extends Service implements Runnable {
 
 	@Override
 	public void onCreate() {
+		Log.d("RBT", "Called onCreate service");
 		/* We should only create one service */
 		/* Berfen wrote: "Services are always singletons by nature!" */
 		super.onCreate();
@@ -258,6 +269,7 @@ public class PlayerService extends Service implements Runnable {
 
 	@Override
 	public void onDestroy() {
+		Log.d("RBT", "Called onDestroy service");
 		// this.stopSelf(); // This is redundant, I'm already dying. Let me die in peace.
 		super.onDestroy();
 		this.stop();
@@ -268,6 +280,7 @@ public class PlayerService extends Service implements Runnable {
 
 	@Override
 	public IBinder onBind(Intent intent) {
+		Log.d("RBT", "Called onBind service");
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -302,6 +315,17 @@ public class PlayerService extends Service implements Runnable {
 	              service.setStatus(msg.what);
 	         }
 	    }
+	}
+	
+	public static boolean setToForeground(Notification n){
+		Log.d("RBT", "Trying to put service in the foreground...");
+		PlayerService i = PlayerService.getInstance();
+		if(i!=null){
+			Log.d("RBT", "Put service in the foreground! Yay! :D");
+			i.startForeground(FOREGROUND_ID, n);
+			return true;
+		}
+		else return false;
 	}
 
 }

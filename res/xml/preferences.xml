@@ -11,11 +11,4 @@
     android:summary="% milliseconds"
     />  
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/preferences_behaviour">
-        <CheckBoxPreference
-    android:key="notification"
-    android:title="@string/preferences_notifications"
-    android:summary="@string/preferences_notifications_desc"
-    android:defaultValue="true" />
-    </PreferenceCategory>
 </PreferenceScreen>
