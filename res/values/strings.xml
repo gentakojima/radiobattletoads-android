@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Radio Battletoads Player Alpha</string>
+    <string name="app_name">Radio Battletoads Player</string>
     <string name="app_version">1</string>
     <string name="action_settings">Settings</string>
     <string name="action_about">About</string>
     <string name="play">Play</string>
-    <string name="pause">Pause</string>
+    <string name="pause">Stop</string>
     <string name="buffering">Buffering&#8230;</string>
     <string name="cantdownloadinfo">Can\'t download current track info. Please check your connection.</string>
     <string name="preferences_title">Preferences</string>
@@ -17,7 +17,7 @@
     <string name="preferences_buffering_warning_minimum">Buffering minimum value is 500ms. The minimum value has been set.</string>
     <string name="preferences_buffering_warning_maximum">Buffering maximum value is 20000ms. The maximum value has been set.</string>
     <string name="aboutTitle">Radio Battletoads Alpha</string>
-    <string name="aboutText">Esta versión del reproductor utiliza libvlc para reproducir la radio. Funciona en dispositivos con procesadores ARM y x86, pero no con procesadores MIPS.</string>
+    <string name="aboutText">Esta versión del reproductor utiliza libvlc para reproducir la radio. Funciona en dispositivos con procesadores ARM, MIPS y x86. La versión para procesadores x86 es más antigua y está menos optimizada.</string>
     <string name="aboutTitle2">¡Pero es una versión alpha!</string>
     <string name="aboutText2">Eso significa que podrían fallar algunas cosas y que no está completa. Por el momento únicamente se puede escuchar la radio. Si el reproductor no funciona, haznos llegar tus comentarios al correo holabuenas@radiobattletoads.com</string>
     <string name="aboutTitle3">Licencia</string>
